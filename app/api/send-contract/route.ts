@@ -41,7 +41,8 @@ export async function POST(req: Request) {
     doc.fontkit = fontkit; // կապում ենք fontkit
 
     const buffers: Uint8Array[] = [];
-    doc.on("data", (chunk) => buffers.push(chunk));
+    // doc.on("data", (chunk) => buffers.push(chunk));
+    doc.on("data", (chunk: Buffer) => buffers.push(chunk));
 
     // PDF content
     doc.fontSize(24).text("Contract Agreement", { align: "center", underline: true });
@@ -71,7 +72,8 @@ export async function POST(req: Request) {
     // PDF ավարտ
     await new Promise<void>((resolve, reject) => {
       doc.on("end", () => resolve());
-      doc.on("error", (err) => reject(err));
+      // doc.on("error", (err) => reject(err));
+      doc.on("error", (err: unknown) => reject(err));
       doc.end();
     });
 
@@ -84,12 +86,17 @@ export async function POST(req: Request) {
       subject: "Your Contract PDF",
       html: `<p>Hello, please find your contract attached.</p>`,
       attachments: [
+        // {
+        //   content: pdfBuffer.toString("base64"),
+        //   filename: "contract.pdf",
+        //   type: "application/pdf",
+        //   disposition: "attachment",
+        // },
         {
-          content: pdfBuffer.toString("base64"),
-          filename: "contract.pdf",
-          type: "application/pdf",
-          disposition: "attachment",
-        },
+  content: pdfBuffer.toString("base64"),
+  filename: "contract.pdf",
+  contentType: "application/pdf", // ✅ այստեղ է հիմնական փոփոխությունը
+}
       ],
     });
 
