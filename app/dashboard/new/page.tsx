@@ -49,7 +49,6 @@ export default function NewContractPage() {
     >
   ) => {
     const target = e.currentTarget;
-
     const value =
       target instanceof HTMLInputElement && target.type === "checkbox"
         ? target.checked
@@ -76,6 +75,7 @@ export default function NewContractPage() {
       return;
     }
 
+    // Save contract to Supabase
     const { error: insertError } = await supabase.from("contracts").insert({
       influencer_id: user.id,
       influencer_email: user.email,
@@ -90,30 +90,63 @@ export default function NewContractPage() {
       return;
     }
 
+    // Send email via server-side API
+    try {
+      const emailRes = await fetch("/api/send-contract", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.clientEmail,
+          employerName: user.email,
+          contractData: form,
+        }),
+      });
+
+      let emailData;
+try {
+  emailData = await emailRes.json();
+} catch (jsonError) {
+  const text = await emailRes.text();
+  console.error("Email response not JSON:", text, jsonError);
+  setError("Contract saved but email failed: Response not JSON");
+  setLoading(false);
+  return;
+}
+
+if (!emailRes.ok) {
+  const msg = emailData?.message || "Unknown email error";
+  console.error("Email failed:", msg);
+  setError("Contract saved but email failed: " + msg);
+  setLoading(false);
+  return;
+}
+
+      if (!emailRes.ok) {
+        console.error("Email failed:", emailData);
+        setError("Contract saved but email failed.");
+        setLoading(false);
+        return;
+      }
+    } catch (err) {
+      console.error("Email request error:", err);
+      setError("Contract saved but email failed.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
     router.push("/dashboard");
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="text-sm text-gray-500 hover:text-gray-900"
-          >
-            ← Back
-          </button>
-          <h1 className="text-lg font-bold text-gray-900">New Contract</h1>
-        </div>
-      </header>
-
       <main className="max-w-2xl mx-auto px-4 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Client */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Client</h2>
-
             <input
               type="email"
               name="clientEmail"
@@ -123,7 +156,6 @@ export default function NewContractPage() {
               placeholder="Client email"
               className="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-black"
             />
-
             <input
               type="text"
               name="brandName"
@@ -138,7 +170,6 @@ export default function NewContractPage() {
           {/* Campaign */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Campaign</h2>
-
             <select
               name="platform"
               value={form.platform}
@@ -152,7 +183,6 @@ export default function NewContractPage() {
               <option value="YouTube">YouTube</option>
               <option value="Blog">Blog</option>
             </select>
-
             <textarea
               name="deliverables"
               value={form.deliverables}
@@ -162,7 +192,6 @@ export default function NewContractPage() {
               placeholder="Deliverables"
               className="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-black"
             />
-
             <div className="grid grid-cols-2 gap-4">
               <input
                 type="date"
@@ -186,7 +215,6 @@ export default function NewContractPage() {
           {/* Payment */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Payment</h2>
-
             <div className="grid grid-cols-3 gap-4">
               <input
                 type="number"
@@ -197,7 +225,6 @@ export default function NewContractPage() {
                 placeholder="Amount"
                 className="col-span-2 border border-gray-300 rounded-xl px-4 py-2 text-sm"
               />
-
               <input
                 type="text"
                 name="currency"
@@ -206,7 +233,6 @@ export default function NewContractPage() {
                 className="border border-gray-300 rounded-xl px-4 py-2 text-sm"
               />
             </div>
-
             <input
               type="number"
               name="paymentDeadlineDays"
@@ -216,10 +242,9 @@ export default function NewContractPage() {
             />
           </div>
 
-          {/* Rights */}
+          {/* Rights & Terms */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Rights & Terms</h2>
-
             {["organic_only", "paid_ads", "full_buyout"].map((value) => (
               <label key={value} className="flex items-center gap-2">
                 <input
@@ -232,7 +257,6 @@ export default function NewContractPage() {
                 <span className="text-sm">{value}</span>
               </label>
             ))}
-
             <input
               type="number"
               name="revisions"
@@ -240,7 +264,6 @@ export default function NewContractPage() {
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm"
             />
-
             <label className="flex items-center justify-between border border-gray-200 rounded-xl px-3 py-2">
               <span className="text-sm font-medium">Exclusivity</span>
               <input
@@ -250,7 +273,6 @@ export default function NewContractPage() {
                 onChange={handleChange}
               />
             </label>
-
             {form.exclusivity && (
               <input
                 type="text"

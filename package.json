@@ -12,13 +12,15 @@
     "@hookform/resolvers": "^5.2.2",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
+    "fontkit": "^2.0.4",
     "next": "16.1.6",
     "pdf-lib": "^1.17.1",
+    "pdfkit": "^0.17.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.2",
     "react-signature-canvas": "^1.1.0-alpha.2",
-    "resend": "^6.9.2",
+    "resend": "^6.9.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {
