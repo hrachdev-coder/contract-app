@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
-type FormState = {
+type ContractFormState = {
   clientEmail: string;
   brandName: string;
   platform: string;
@@ -20,28 +20,43 @@ type FormState = {
   exclusivityDuration: string;
 };
 
-export default function NewContractPage() {
+type ContractRow = {
+  id: string;
+  client_email?: string | null;
+  contract_data?: Partial<ContractFormState> | null;
+};
+
+export default function EditContractForm({
+  contract,
+}: {
+  contract: ContractRow;
+}) {
   const router = useRouter();
   const supabase = createClient();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [form, setForm] = useState<FormState>({
-    clientEmail: "",
-    brandName: "",
-    platform: "",
-    deliverables: "",
-    campaignStartDate: "",
-    campaignEndDate: "",
-    paymentAmount: "",
-    currency: "USD",
-    paymentDeadlineDays: "30",
-    usageRights: "organic_only",
-    revisions: "1",
-    exclusivity: false,
-    exclusivityDuration: "",
-  });
+  const [form, setForm] = useState<ContractFormState>(() => ({
+    clientEmail:
+      contract.contract_data?.clientEmail ??
+      (contract.client_email as string) ??
+      "",
+    brandName: contract.contract_data?.brandName ?? "",
+    platform: contract.contract_data?.platform ?? "",
+    deliverables: contract.contract_data?.deliverables ?? "",
+    campaignStartDate: contract.contract_data?.campaignStartDate ?? "",
+    campaignEndDate: contract.contract_data?.campaignEndDate ?? "",
+    paymentAmount: contract.contract_data?.paymentAmount ?? "",
+    currency: contract.contract_data?.currency ?? "USD",
+    paymentDeadlineDays:
+      contract.contract_data?.paymentDeadlineDays ?? "30",
+    usageRights: contract.contract_data?.usageRights ?? "organic_only",
+    revisions: contract.contract_data?.revisions ?? "1",
+    exclusivity: Boolean(contract.contract_data?.exclusivity),
+    exclusivityDuration:
+      contract.contract_data?.exclusivityDuration ?? "",
+  }));
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -65,81 +80,16 @@ export default function NewContractPage() {
     setLoading(true);
     setError(null);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { error: updateError } = await supabase
+      .from("contracts")
+      .update({
+        contract_data: form,
+        status: "updated",
+      })
+      .eq("id", contract.id);
 
-    if (!user) {
-      setLoading(false);
-      router.push("/login");
-      return;
-    }
-
-    // Public token for link-based review (no auth required on client's side)
-    const publicToken =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-
-    // Save contract to Supabase
-    const { error: insertError } = await supabase.from("contracts").insert({
-      influencer_id: user.id,
-      influencer_email: user.email,
-      client_email: form.clientEmail,
-      contract_data: form,
-      status: "sent",
-      public_token: publicToken,
-    });
-
-    if (insertError) {
-      setError(insertError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Send email via server-side API
-    try {
-      const emailRes = await fetch("/api/send-contract", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.clientEmail,
-          employerName: user.email,
-          contractData: form,
-          publicToken,
-        }),
-      });
-
-      let emailData;
-try {
-  emailData = await emailRes.json();
-} catch (jsonError) {
-  const text = await emailRes.text();
-  console.error("Email response not JSON:", text, jsonError);
-  setError("Contract saved but email failed: Response not JSON");
-  setLoading(false);
-  return;
-}
-
-if (!emailRes.ok) {
-  const msg = emailData?.message || "Unknown email error";
-  console.error("Email failed:", msg);
-  setError("Contract saved but email failed: " + msg);
-  setLoading(false);
-  return;
-}
-
-      if (!emailRes.ok) {
-        console.error("Email failed:", emailData);
-        setError("Contract saved but email failed.");
-        setLoading(false);
-        return;
-      }
-    } catch (err) {
-      console.error("Email request error:", err);
-      setError("Contract saved but email failed.");
+    if (updateError) {
+      setError(updateError.message);
       setLoading(false);
       return;
     }
@@ -152,17 +102,14 @@ if (!emailRes.ok) {
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-2xl mx-auto px-4 py-8">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Client */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Client</h2>
             <input
               type="email"
               name="clientEmail"
               value={form.clientEmail}
-              onChange={handleChange}
-              required
-              placeholder="Client email"
-              className="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-black"
+              disabled
+              className="w-full border border-gray-200 rounded-xl px-4 py-2 text-sm bg-gray-50 text-gray-500"
             />
             <input
               type="text"
@@ -175,7 +122,6 @@ if (!emailRes.ok) {
             />
           </div>
 
-          {/* Campaign */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Campaign</h2>
             <select
@@ -220,7 +166,6 @@ if (!emailRes.ok) {
             </div>
           </div>
 
-          {/* Payment */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Payment</h2>
             <div className="grid grid-cols-3 gap-4">
@@ -250,7 +195,6 @@ if (!emailRes.ok) {
             />
           </div>
 
-          {/* Rights & Terms */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Rights & Terms</h2>
             {["organic_only", "paid_ads", "full_buyout"].map((value) => (
@@ -293,17 +237,18 @@ if (!emailRes.ok) {
             )}
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-black text-white rounded-xl py-3 text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
           >
-            {loading ? "Sending..." : "Send contract to client →"}
+            {loading ? "Saving..." : "Save changes →"}
           </button>
         </form>
       </main>
     </div>
   );
 }
+

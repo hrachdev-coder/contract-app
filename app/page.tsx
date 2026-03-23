@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HomePage() {
 
   return (
@@ -496,14 +498,14 @@ export default function HomePage() {
       {/* ── NAV ── */}
       <nav className="nav">
         <div className="nav-inner">
-          <a href="/" className="logo">
+          <Link href="/" className="logo">
             <div className="logo-mark">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M3 4.5h12M3 9h8M3 13.5h10" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
               </svg>
             </div>
             <span className="logo-text">Contrakt</span>
-          </a>
+          </Link>
           <div className="nav-links">
             <a href="#features"     className="nav-link">Features</a>
             <a href="#how-it-works" className="nav-link">How it works</a>
@@ -782,7 +784,7 @@ export default function HomePage() {
                   </svg>
                 ))}
               </div>
-              <p className="testi-quote">"{t.q}"</p>
+              <p className="testi-quote">&quot;{t.q}&quot;</p>
               <div className="testi-author">
                 <div className="testi-av" style={{ background:t.bg, color:t.fg }}>{t.i}</div>
                 <div>
@@ -818,14 +820,14 @@ export default function HomePage() {
       {/* ── FOOTER ── */}
       <footer className="footer">
         <div className="footer-inner">
-          <a href="/" className="logo">
+          <Link href="/" className="logo">
             <div className="logo-mark" style={{ width:30, height:30, borderRadius:8 }}>
               <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
                 <path d="M3 4.5h12M3 9h8M3 13.5h10" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
               </svg>
             </div>
             <span className="logo-text" style={{ fontSize:18 }}>Contrakt</span>
-          </a>
+          </Link>
           <div className="footer-links">
             {["Privacy","Terms","Support","Blog"].map((l) => (
               <a key={l} href={`/${l.toLowerCase()}`} className="footer-link">{l}</a>
