@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const serviceSupabase = createServiceClient();
     const body = await req.json();
     const { contractId } = body;
 
@@ -28,18 +27,39 @@ export async function POST(req: Request) {
       );
     }
 
-    // Use service-role delete to avoid RLS no-op responses and confirm actual deletion.
-    const { data: deletedRows, error } = await serviceSupabase
-      .from("contracts")
-      .delete()
-      .eq("id", contractId)
-      .eq("influencer_id", user.id)
-      .select("id");
+    let deletedRows: Array<{ id: string }> | null = null;
+    let error: { message?: string } | null = null;
+
+    // Try service-role delete first. If env is missing in production, fall back
+    // to the authenticated server client so the feature still works.
+    try {
+      const serviceSupabase = createServiceClient();
+      const serviceDelete = await serviceSupabase
+        .from("contracts")
+        .delete()
+        .eq("id", contractId)
+        .eq("influencer_id", user.id)
+        .select("id");
+
+      deletedRows = serviceDelete.data as Array<{ id: string }> | null;
+      error = serviceDelete.error as { message?: string } | null;
+    } catch (serviceClientError) {
+      console.warn("Service client unavailable, using authenticated delete:", serviceClientError);
+      const fallbackDelete = await supabase
+        .from("contracts")
+        .delete()
+        .eq("id", contractId)
+        .eq("influencer_id", user.id)
+        .select("id");
+
+      deletedRows = fallbackDelete.data as Array<{ id: string }> | null;
+      error = fallbackDelete.error as { message?: string } | null;
+    }
 
     if (error) {
       console.error("Delete contract error:", error);
       return NextResponse.json(
-        { success: false, message: error.message },
+        { success: false, message: error.message || "Delete failed" },
         { status: 500 }
       );
     }
