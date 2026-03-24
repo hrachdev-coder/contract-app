@@ -38,7 +38,7 @@ export default function ResendContractButton({
         type="button"
         onClick={handleResend}
         disabled={loading}
-        className="bg-gray-900 text-white text-xs px-3 py-1.5 rounded-xl hover:bg-gray-800 disabled:opacity-50"
+        className="btn-resend disabled:opacity-50"
       >
         {loading ? "Resending..." : "Resend"}
       </button>

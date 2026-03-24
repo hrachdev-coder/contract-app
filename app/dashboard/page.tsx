@@ -2,8 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import ResendContractButton from "../components/ResendContractButton";
+import LogoutButton from "../components/LogoutButton";
 import type { ContractStatus } from "@/app/types/contracts";
-// import LogoutButton from "./LogoutButton";
+import "./dashboard.css";
+import "../home.css";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -25,84 +27,185 @@ export default async function DashboardPage() {
     ContractStatus,
     { label: string; className: string }
   > = {
-    sent: { label: "Pending", className: "bg-yellow-100 text-yellow-700" },
-    viewed: { label: "Viewed", className: "bg-blue-100 text-blue-700" },
+    sent: { label: "Pending", className: "status-pending" },
+    viewed: { label: "Viewed", className: "status-viewed" },
     changes_requested: {
       label: "Needs Changes",
-      className: "bg-orange-100 text-orange-700",
+      className: "status-changes",
     },
-    updated: { label: "Updated", className: "bg-purple-100 text-purple-700" },
-    accepted: { label: "Accepted", className: "bg-green-100 text-green-700" },
+    updated: { label: "Updated", className: "status-updated" },
+    accepted: { label: "Accepted", className: "status-accepted" },
     completed: {
       label: "Completed",
-      className: "bg-emerald-200 text-emerald-800",
+      className: "status-completed",
     },
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-   
+    <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
+      {/* ── NAV ── */}
+      <nav className="nav">
+        <div className="nav-inner">
+          <Link href="/" className="logo">
+            <div className="logo-mark">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M3 4.5h12M3 9h8M3 13.5h10" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <span className="logo-text">Contrakt</span>
+          </Link>
+          <div className="nav-links">
+            <a href="/#features"     className="nav-link">Features</a>
+            <a href="/#how-it-works" className="nav-link">How it works</a>
+            <a href="/#reviews"      className="nav-link">Reviews</a>
+            <div className="nav-divider" />
+            <Link href="/dashboard" className="btn-ghost">Dashboard</Link>
+            <LogoutButton />
+          </div>
+        </div>
+      </nav>
 
-      {/* Main */}
-      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
-            My Contracts
-          </h2>
-          <Link
-            href="/dashboard/new"
-            className="bg-black text-white text-sm px-4 py-2 rounded-xl hover:bg-gray-800"
-          >
+      <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Welcome back,<br /><em>{user?.email?.split('@')[0]}</em></h1>
+        <p className="dashboard-subtitle">Manage your contracts and track brand deals from one beautiful dashboard.</p>
+        
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                <rect x="3" y="3" width="20" height="20" rx="5" stroke="#3b82f6" strokeWidth="1.6"/>
+                <path d="M8 9h10M8 13h7M8 17h5" stroke="#3b82f6" strokeWidth="1.6" strokeLinecap="round"/>
+                <circle cx="20" cy="20" r="5" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1.4"/>
+                <path d="M18.5 20l1 1 2.5-2" stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="stat-value">{contracts?.length || 0}</div>
+            <div className="stat-label">Total Contracts</div>
+          </div>
+          
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                <circle cx="13" cy="13" r="9" stroke="#10b981" strokeWidth="1.6"/>
+                <path d="M13 8v5.5l3.5 3.5" stroke="#10b981" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="stat-value">
+              {contracts?.filter(c => c.status === 'accepted' || c.status === 'completed').length || 0}
+            </div>
+            <div className="stat-label">Active Deals</div>
+          </div>
+          
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                <path d="M4 6h18v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="#64748b" strokeWidth="1.6"/>
+                <path d="M9 6V4M17 6V4M4 11h18" stroke="#64748b" strokeWidth="1.6" strokeLinecap="round"/>
+                <path d="M9 16l2 2 4-4" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="stat-value">
+              ${contracts?.reduce((sum, c) => {
+                const amount = parseFloat(c.contract_data?.paymentAmount || '0');
+                return sum + amount;
+              }, 0).toLocaleString()}
+            </div>
+            <div className="stat-label">Total Value</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="contracts-section">
+        <div className="section-header">
+          <h2 className="section-title">My Contracts</h2>
+          <Link href="/dashboard/new" className="btn-primary">
             + New Contract
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
           </Link>
         </div>
 
-        {/* Contracts list */}
         {!contracts || contracts.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-lg">No contracts yet</p>
-            <p className="text-sm mt-1">
-              Create your first contract to get started
-            </p>
+          <div className="empty-state">
+            <div className="empty-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <rect x="5" y="5" width="30" height="30" rx="8" stroke="#64748b" strokeWidth="2"/>
+                <path d="M10 12h20M10 18h14M10 24h16" stroke="#64748b" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <h3 className="empty-title">No contracts yet</h3>
+            <p className="empty-subtitle">Create your first contract to start closing deals with brands</p>
+            <Link href="/dashboard/new" className="btn-primary">
+              Create Your First Contract
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="contracts-grid">
             {contracts.map((contract) => {
               const meta =
                 statusMeta[(contract.status as ContractStatus) || "sent"] ??
                 statusMeta.sent;
 
               return (
-                <div
-                  key={contract.id}
-                  className="bg-white rounded-2xl border border-gray-200 px-5 py-4 flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {contract.contract_data?.brandName || "Untitled"}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {contract.client_email}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(contract.created_at).toLocaleDateString()}
-                    </p>
+                <div key={contract.id} className="contract-card">
+                  <div className="contract-header">
+                    <div className="contract-info">
+                      <h3 className="contract-brand">
+                        {contract.contract_data?.brandName || "Untitled Contract"}
+                      </h3>
+                      <p className="contract-email">{contract.client_email}</p>
+                      <p className="contract-date">
+                        {new Date(contract.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    <div className="contract-status">
+                      <span className={`status-badge ${meta.className}`}>
+                        {meta.label}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full font-medium ${meta.className}`}
-                    >
-                      {meta.label}
-                    </span>
-                  </div>
-
+                  
+                  {contract.contract_data && (
+                    <div style={{ marginTop: '16px' }}>
+                      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                        <div>
+                          <span style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Platform</span>
+                          <p style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', marginTop: '4px' }}>
+                            {contract.contract_data.platform || 'N/A'}
+                          </p>
+                        </div>
+                        <div>
+                          <span style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Payment</span>
+                          <p style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', marginTop: '4px' }}>
+                            {contract.contract_data.currency || '$'}{contract.contract_data.paymentAmount || '0'}
+                          </p>
+                        </div>
+                        <div>
+                          <span style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Deliverables</span>
+                          <p style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', marginTop: '4px' }}>
+                            {contract.contract_data.deliverables || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {contract.status === "changes_requested" && (
-                    <div className="ml-4 flex items-center gap-2">
+                    <div className="contract-actions">
                       <Link
                         href={`/dashboard/edit/${contract.id}`}
-                        className="bg-gray-100 text-gray-900 text-xs px-3 py-1.5 rounded-xl hover:bg-gray-200"
+                        className="btn-secondary"
                       >
-                        Edit
+                        Edit Contract
                       </Link>
                       <ResendContractButton publicToken={contract.public_token} />
                     </div>
@@ -112,7 +215,8 @@ export default async function DashboardPage() {
             })}
           </div>
         )}
-      </main>
+      </div>
+      </div>
     </div>
   );
 }
