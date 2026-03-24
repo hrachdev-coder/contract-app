@@ -1,7 +1,6 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
-import * as fontkit from "fontkit";
 
 import type { ContractData } from "@/app/types/contracts";
 
@@ -21,7 +20,6 @@ export async function generateContractPdfBuffer(args: {
     margin: 50,
     font: fontPath,
   });
-  doc.fontkit = fontkit;
 
   const buffers: Uint8Array[] = [];
   doc.on("data", (chunk: unknown) => {

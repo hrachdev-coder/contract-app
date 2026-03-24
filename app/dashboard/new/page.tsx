@@ -104,9 +104,7 @@ export default function NewContractPage() {
     try {
       const emailRes = await fetch("/api/send-contract", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: form.clientEmail,
           employerName: user.email,
@@ -115,28 +113,12 @@ export default function NewContractPage() {
         }),
       });
 
-      let emailData;
-try {
-  emailData = await emailRes.json();
-} catch (jsonError) {
-  const text = await emailRes.text();
-  console.error("Email response not JSON:", text, jsonError);
-  setError("Contract saved but email failed: Response not JSON");
-  setLoading(false);
-  return;
-}
-
-if (!emailRes.ok) {
-  const msg = emailData?.message || "Unknown email error";
-  console.error("Email failed:", msg);
-  setError("Contract saved but email failed: " + msg);
-  setLoading(false);
-  return;
-}
+      const emailData = await emailRes.json().catch(() => ({}));
 
       if (!emailRes.ok) {
-        console.error("Email failed:", emailData);
-        setError("Contract saved but email failed.");
+        const msg = (emailData as any)?.message || "Unknown email error";
+        console.error("Email failed:", msg);
+        setError("Contract saved but email failed: " + msg);
         setLoading(false);
         return;
       }

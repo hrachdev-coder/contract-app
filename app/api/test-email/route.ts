@@ -23,12 +23,11 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("Using API Key:", process.env.RESEND_API_KEY ? "Key exists" : "Key missing");
-
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
     const data = await resend.emails.send({
-      from: "hrach.dev@gmail.com",
+      from: fromEmail,
       to: email,
       subject: "Test Email from Contract App",
       html: `

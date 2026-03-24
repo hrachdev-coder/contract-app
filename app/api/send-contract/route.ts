@@ -3,18 +3,25 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   try {
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json(
+        { success: false, message: "RESEND_API_KEY is not configured" },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    // Always use the configured sender — never trust client-supplied addresses.
+    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+
     const body = await req.json();
     const { email, employerName, contractData, publicToken } = body;
 
     console.log("=== EMAIL SEND DEBUG ===");
     console.log("To:", email);
-    console.log("From: hrach.dev@gmail.com");
-    console.log("API Key exists:", !!process.env.RESEND_API_KEY);
-    console.log("API Key length:", process.env.RESEND_API_KEY?.length || 0);
+    console.log("From:", fromEmail);
 
     // Վերահսկում պարտադիր դաշտերը
     if (!email || !employerName || !contractData || !publicToken) {
@@ -33,7 +40,7 @@ export async function POST(req: Request) {
     console.log("Sending email via Resend...");
     
     const data = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: fromEmail,
       to: email,
       subject,
       html: `

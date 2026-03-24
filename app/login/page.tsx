@@ -12,12 +12,86 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [devLinkLoading, setDevLinkLoading] = useState(false);
+  const [devSignInLink, setDevSignInLink] = useState<string | null>(null);
+
+  const emailRedirectTo =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback?next=/dashboard`
+      : undefined;
+
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setError("Enter your email first, then resend confirmation.");
+      return;
+    }
+
+    setResending(true);
+    setError(null);
+    setInfo(null);
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo,
+        },
+      });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      setInfo("Confirmation email sent. Please check inbox, spam, and promotions.");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const handleGenerateDevSignInLink = async () => {
+    if (!email) {
+      setError("Enter your email first.");
+      return;
+    }
+
+    setDevLinkLoading(true);
+    setError(null);
+    setInfo(null);
+    setDevSignInLink(null);
+
+    try {
+      const res = await fetch("/api/auth/dev-confirmation-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.message || "Could not generate confirmation link.");
+        return;
+      }
+
+      setInfo("Dev sign-in link generated below.");
+      setDevSignInLink(data?.actionLink || null);
+    } finally {
+      setDevLinkLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setInfo(null);
 
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
@@ -83,6 +157,12 @@ export default function LoginPage() {
               </div>
             )}
 
+            {info && (
+              <div className="auth-success" style={{ color: "#166534", fontSize: "14px" }}>
+                {info}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
@@ -90,6 +170,42 @@ export default function LoginPage() {
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
+
+            <button
+              type="button"
+              onClick={handleResendConfirmation}
+              disabled={resending || loading}
+              className="auth-submit"
+              style={{
+                marginTop: "10px",
+                background: "transparent",
+                color: "#0f172a",
+                border: "1px solid #cbd5e1",
+              }}
+            >
+              {resending ? "Resending confirmation..." : "Resend confirmation email"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGenerateDevSignInLink}
+              disabled={devLinkLoading || loading}
+              className="auth-submit"
+              style={{
+                marginTop: "10px",
+                background: "transparent",
+                color: "#0f172a",
+                border: "1px solid #cbd5e1",
+              }}
+            >
+              {devLinkLoading ? "Generating link..." : "Generate dev sign-in link"}
+            </button>
+
+            {devSignInLink && (
+              <p style={{ fontSize: "13px", marginTop: "10px", wordBreak: "break-all" }}>
+                Dev link: <a href={devSignInLink}>{devSignInLink}</a>
+              </p>
+            )}
           </form>
 
           <div className="auth-footer">
