@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const subject = `Contract review from ${employerName}`;
 
     const data = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: "hrach.dev@gmail.com",
       to: email,
       subject,
       html: `
