@@ -133,13 +133,6 @@ if (!emailRes.ok) {
   setLoading(false);
   return;
 }
-
-      if (!emailRes.ok) {
-        console.error("Email failed:", emailData);
-        setError("Contract saved but email failed.");
-        setLoading(false);
-        return;
-      }
     } catch (err) {
       console.error("Email request error:", err);
       setError("Contract saved but email failed.");

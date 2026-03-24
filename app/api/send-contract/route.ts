@@ -5,6 +5,8 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const FROM_EMAIL = "onboarding@resend.dev";
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -12,7 +14,7 @@ export async function POST(req: Request) {
 
     console.log("=== EMAIL SEND DEBUG ===");
     console.log("To:", email);
-    console.log("From: hrach.dev@gmail.com");
+    console.log("From:", FROM_EMAIL);
     console.log("API Key exists:", !!process.env.RESEND_API_KEY);
     console.log("API Key length:", process.env.RESEND_API_KEY?.length || 0);
 
@@ -33,7 +35,7 @@ export async function POST(req: Request) {
     console.log("Sending email via Resend...");
     
     const data = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: FROM_EMAIL,
       to: email,
       subject,
       html: `
