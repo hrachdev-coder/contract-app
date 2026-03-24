@@ -7,9 +7,17 @@ import LogoutButton from "./LogoutButton";
 
 export default function HomeHeader() {
   const [user, setUser] = useState<{ email?: string } | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return;
+    }
+
+    const supabase = createClient();
+
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
@@ -24,7 +32,7 @@ export default function HomeHeader() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   return (
     <nav className="nav">

@@ -6,9 +6,17 @@ import Link from "next/link";
 
 export default function Header() {
   const [user, setUser] = useState<{ email?: string } | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return;
+    }
+
+    const supabase = createClient();
+
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
@@ -23,9 +31,10 @@ export default function Header() {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   const handleLogout = async () => {
+    const supabase = createClient();
     await supabase.auth.signOut();
     window.location.href = "/";
   };
