@@ -10,6 +10,12 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, employerName, contractData, publicToken } = body;
 
+    console.log("=== EMAIL SEND DEBUG ===");
+    console.log("To:", email);
+    console.log("From: hrach.dev@gmail.com");
+    console.log("API Key exists:", !!process.env.RESEND_API_KEY);
+    console.log("API Key length:", process.env.RESEND_API_KEY?.length || 0);
+
     // Վերահսկում պարտադիր դաշտերը
     if (!email || !employerName || !contractData || !publicToken) {
       return NextResponse.json(
@@ -24,8 +30,10 @@ export async function POST(req: Request) {
 
     const subject = `Contract review from ${employerName}`;
 
+    console.log("Sending email via Resend...");
+    
     const data = await resend.emails.send({
-      from: "hrach.dev@gmail.com",
+      from: "onboarding@resend.dev",
       to: email,
       subject,
       html: `
@@ -36,10 +44,12 @@ export async function POST(req: Request) {
             Review and accept or request changes
           </a>
         </p>
-        <p>If the link doesn’t work, copy/paste this URL into your browser:</p>
+        <p>If the link doesn't work, copy/paste this URL into your browser:</p>
         <p style="word-break: break-all;">${reviewUrl}</p>
       `,
     });
+
+    console.log("Email sent successfully:", data);
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
