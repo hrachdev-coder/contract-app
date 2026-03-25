@@ -32,11 +32,12 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
   const [form, setForm] = useState<ContractData>(props.contractData);
   const [feedback, setFeedback] = useState(props.initialFeedback || "");
   const [status, setStatus] = useState(props.initialStatus);
-  const [loadingAction, setLoadingAction] = useState<"request_changes" | "accept" | null>(null);
+  const [loadingAction, setLoadingAction] = useState<"request_changes" | "accept" | "send_updated" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const isCompleted = useMemo(() => status === "completed", [status]);
+  const canSendUpdatedContract = useMemo(() => status === "changes_requested", [status]);
 
   const handleFormChange =
     (key: keyof ContractData) =>
@@ -84,6 +85,36 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         setSuccess("Contract accepted. Final PDF was emailed to both you and the brand.");
       }
 
+      router.refresh();
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const sendUpdatedContract = async () => {
+    setLoadingAction("send_updated");
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await fetch(`/api/contract/${props.publicToken}/resend`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contractData: form,
+        }),
+      });
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.message || "Failed to send updated contract");
+        return;
+      }
+
+      setStatus("updated");
+      setSuccess("Updated contract sent. The creator has been notified by email.");
       router.refresh();
     } finally {
       setLoadingAction(null);
@@ -203,37 +234,57 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
 
         {!isCompleted && (
           <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <button
-              type="button"
-              onClick={() => submitAction("request_changes")}
-              disabled={Boolean(loadingAction)}
-              style={{
-                border: "1px solid #f59e0b",
-                background: "#fffbeb",
-                color: "#92400e",
-                borderRadius: "999px",
-                padding: "10px 18px",
-                fontWeight: 600,
-              }}
-            >
-              {loadingAction === "request_changes" ? "Submitting..." : "Request edits"}
-            </button>
+            {canSendUpdatedContract ? (
+              <button
+                type="button"
+                onClick={sendUpdatedContract}
+                disabled={Boolean(loadingAction)}
+                style={{
+                  border: "1px solid #2563eb",
+                  background: "#dbeafe",
+                  color: "#1d4ed8",
+                  borderRadius: "999px",
+                  padding: "10px 18px",
+                  fontWeight: 700,
+                }}
+              >
+                {loadingAction === "send_updated" ? "Sending update..." : "Send updated contract"}
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => submitAction("request_changes")}
+                  disabled={Boolean(loadingAction)}
+                  style={{
+                    border: "1px solid #f59e0b",
+                    background: "#fffbeb",
+                    color: "#92400e",
+                    borderRadius: "999px",
+                    padding: "10px 18px",
+                    fontWeight: 600,
+                  }}
+                >
+                  {loadingAction === "request_changes" ? "Submitting..." : "Request edits"}
+                </button>
 
-            <button
-              type="button"
-              onClick={() => submitAction("accept")}
-              disabled={Boolean(loadingAction)}
-              style={{
-                border: "1px solid #16a34a",
-                background: "#dcfce7",
-                color: "#166534",
-                borderRadius: "999px",
-                padding: "10px 18px",
-                fontWeight: 700,
-              }}
-            >
-              {loadingAction === "accept" ? "Finalizing..." : "Accept contract"}
-            </button>
+                <button
+                  type="button"
+                  onClick={() => submitAction("accept")}
+                  disabled={Boolean(loadingAction)}
+                  style={{
+                    border: "1px solid #16a34a",
+                    background: "#dcfce7",
+                    color: "#166534",
+                    borderRadius: "999px",
+                    padding: "10px 18px",
+                    fontWeight: 700,
+                  }}
+                >
+                  {loadingAction === "accept" ? "Finalizing..." : "Accept contract"}
+                </button>
+              </>
+            )}
           </div>
         )}
       </section>

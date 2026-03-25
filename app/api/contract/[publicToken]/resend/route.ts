@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
+import type { ContractData } from "@/app/types/contracts";
 
 type ResendRouteContext = {
   params: Promise<{ publicToken: string }>;
@@ -43,6 +44,30 @@ export async function POST(req: Request, context: ResendRouteContext) {
         { success: false, message: "Contract not found" },
         { status: 404 }
       );
+    }
+
+    let incomingContractData: ContractData | null = null;
+    try {
+      const body = await req.json();
+      if (body && typeof body.contractData === "object") {
+        incomingContractData = body.contractData as ContractData;
+      }
+    } catch {
+      // No JSON body is expected for the default resend button flow.
+    }
+
+    if (incomingContractData) {
+      const { error: dataUpdateError } = await supabase
+        .from("contracts")
+        .update({ contract_data: incomingContractData })
+        .eq("id", contract.id);
+
+      if (dataUpdateError) {
+        return NextResponse.json(
+          { success: false, message: dataUpdateError.message },
+          { status: 500 }
+        );
+      }
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
