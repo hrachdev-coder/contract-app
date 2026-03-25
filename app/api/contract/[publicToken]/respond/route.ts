@@ -65,6 +65,14 @@ export async function POST(req: Request, context: RespondRouteContext) {
       );
     }
 
+    // Prevent any action on an already-completed contract to avoid duplicate PDFs.
+    if (contract.status === "completed") {
+      return NextResponse.json(
+        { success: false, message: "Contract is already completed" },
+        { status: 409 }
+      );
+    }
+
     if (action === "request_changes") {
       const feedback = typeof body?.feedback === "string" ? body.feedback.trim() : "";
       const incomingData = (body?.contractData || {}) as Partial<ContractData>;
