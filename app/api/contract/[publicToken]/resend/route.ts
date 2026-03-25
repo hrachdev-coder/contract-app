@@ -8,7 +8,7 @@ type ResendRouteContext = {
   params: Promise<{ publicToken: string }>;
 };
 
-export async function POST(_req: Request, context: ResendRouteContext) {
+export async function POST(req: Request, context: ResendRouteContext) {
   try {
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(_req: Request, context: ResendRouteContext) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl = new URL(req.url).origin;
     const reviewUrl = `${baseUrl}/contract/${contract.public_token}`;
     const employerName = contract.influencer_email || "Your collaborator";
 
