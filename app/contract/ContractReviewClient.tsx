@@ -78,10 +78,10 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
 
       if (action === "request_changes") {
         setStatus("changes_requested");
-        setSuccess("Your changes were submitted to the influencer for review.");
+        setSuccess("Your requested edits were sent back to the brand.");
       } else {
         setStatus("completed");
-        setSuccess("Contract accepted. Final PDF was emailed to both parties.");
+        setSuccess("Contract accepted. Final PDF was emailed to both you and the brand.");
       }
 
       router.refresh();
@@ -117,7 +117,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
               {form.brandName || "Contract"}
             </h1>
             <p style={{ marginTop: "8px", color: "#475569" }}>
-              Review, adjust, and submit this contract.
+              Review the campaign terms, request edits, or approve the agreement.
             </p>
           </div>
           <div
@@ -139,8 +139,8 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         </div>
 
         <div style={{ marginTop: "18px", display: "grid", gap: "10px" }}>
-          <div><strong>From:</strong> {props.influencerEmail || "Unknown"}</div>
-          <div><strong>To:</strong> {props.clientEmail}</div>
+          <div><strong>From brand:</strong> {props.influencerEmail || "Unknown"}</div>
+          <div><strong>For creator:</strong> {props.clientEmail}</div>
           <div><strong>Created:</strong> {new Date(props.createdAt).toLocaleDateString()}</div>
         </div>
 
@@ -216,7 +216,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
                 fontWeight: 600,
               }}
             >
-              {loadingAction === "request_changes" ? "Submitting..." : "Request changes"}
+              {loadingAction === "request_changes" ? "Submitting..." : "Request edits"}
             </button>
 
             <button
@@ -232,7 +232,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
                 fontWeight: 700,
               }}
             >
-              {loadingAction === "accept" ? "Finalizing..." : "Accept and send final PDF"}
+              {loadingAction === "accept" ? "Finalizing..." : "Accept contract"}
             </button>
           </div>
         )}

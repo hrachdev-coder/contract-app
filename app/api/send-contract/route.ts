@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     const baseUrl = new URL(req.url).origin;
     const reviewUrl = `${baseUrl}/contract/${publicToken}`;
 
-    const subject = `Contract review from ${employerName}`;
+    const subject = `Campaign contract from ${employerName}`;
 
     console.log("Sending email via Resend...");
     
@@ -44,13 +44,13 @@ export async function POST(req: Request) {
       subject,
       html: `
         <p>Hello,</p>
-        <p><b>${employerName}</b> has sent you a contract to review.</p>
+        <p><b>${employerName}</b> has sent you a campaign contract to review.</p>
         <p>
           <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer">
-            Review and accept or request changes
+            Review contract
           </a>
         </p>
-        <p>If the link doesn't work, copy/paste this URL into your browser:</p>
+        <p>If the button does not work, copy and paste this URL into your browser:</p>
         <p style="word-break: break-all;">${reviewUrl}</p>
       `,
     });

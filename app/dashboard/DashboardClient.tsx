@@ -43,7 +43,7 @@ export default function DashboardClient() {
     ContractStatus,
     { label: string; className: string }
   > = {
-    sent: { label: "Pending", className: "status-pending" },
+    sent: { label: "Sent", className: "status-pending" },
     viewed: { label: "Viewed", className: "status-viewed" },
     changes_requested: {
       label: "Needs Changes",
@@ -157,7 +157,7 @@ export default function DashboardClient() {
       <div className="dashboard-container">
         <div className="dashboard-header">
           <h1 className="dashboard-title">Welcome back,<br /><em>{user?.email?.split('@')[0]}</em></h1>
-          <p className="dashboard-subtitle">Manage your contracts and track brand deals from one beautiful dashboard.</p>
+          <p className="dashboard-subtitle">Manage creator contracts and track every review from one dashboard.</p>
           
           <div className="stats-grid">
             <div className="stat-card">
@@ -186,7 +186,7 @@ export default function DashboardClient() {
                   return status === "completed";
                 }).length}
               </div>
-              <div className="stat-label">Active Deals</div>
+              <div className="stat-label">Completed Contracts</div>
             </div>
             
             <div className="stat-card">
@@ -210,7 +210,7 @@ export default function DashboardClient() {
 
         <div className="contracts-section">
           <div className="section-header">
-            <h2 className="section-title">My Contracts</h2>
+            <h2 className="section-title">Creator Contracts</h2>
             <Link href="/dashboard/new" className="btn-primary">
               + New Contract
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -228,7 +228,7 @@ export default function DashboardClient() {
                 </svg>
               </div>
               <h3 className="empty-title">No contracts yet</h3>
-              <p className="empty-subtitle">Create your first contract to start closing deals with brands</p>
+              <p className="empty-subtitle">Create your first creator contract and send it out for review</p>
               <Link href="/dashboard/new" className="btn-primary">
                 Create Your First Contract
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

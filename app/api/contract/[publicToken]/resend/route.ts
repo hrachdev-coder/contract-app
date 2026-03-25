@@ -49,18 +49,18 @@ export async function POST(req: Request, context: ResendRouteContext) {
     const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
     const baseUrl = new URL(req.url).origin;
     const reviewUrl = `${baseUrl}/contract/${contract.public_token}`;
-    const employerName = contract.influencer_email || "Your collaborator";
+    const employerName = contract.influencer_email || "Your brand contact";
 
     const result = await resend.emails.send({
       from: fromEmail,
       to: contract.client_email,
-      subject: `Contract review from ${employerName}`,
+      subject: `Updated campaign contract from ${employerName}`,
       html: `
         <p>Hello,</p>
-        <p><b>${employerName}</b> has sent you a contract to review.</p>
+        <p><b>${employerName}</b> has sent you an updated contract to review.</p>
         <p>
           <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer">
-            Review and accept or request changes
+            Review updated contract
           </a>
         </p>
         <p>If the link does not work, copy and paste this URL:</p>

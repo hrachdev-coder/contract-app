@@ -78,7 +78,7 @@ export default function NewContractPage() {
       return;
     }
 
-    // Public token for link-based review (no auth required on client's side)
+    // Public token for link-based review (no auth required on the creator's side)
     const publicToken =
       typeof crypto !== "undefined" && "randomUUID" in crypto
         ? crypto.randomUUID()
@@ -140,14 +140,14 @@ export default function NewContractPage() {
       <div className="contract-form-container">
         <div className="contract-form-wrapper">
           <div className="contract-form-header">
-            <h1 className="contract-form-title">Create <em>Contract</em></h1>
+            <h1 className="contract-form-title">Create <em>Campaign Contract</em></h1>
             <p className="contract-form-subtitle">
-              Build a professional influencer contract in minutes
+              Prepare terms for a creator collaboration and send them for review
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="contract-form">
-            {/* Client Information */}
+            {/* Influencer Information */}
             <div className="form-section">
               <div className="form-section-header">
                 <div className="form-section-icon">
@@ -157,21 +157,21 @@ export default function NewContractPage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="form-section-title">Client Information</h2>
-                  <p className="form-section-subtitle">Who are you working with?</p>
+                  <h2 className="form-section-title">Influencer Information</h2>
+                  <p className="form-section-subtitle">Who should review this contract?</p>
                 </div>
               </div>
               
               <div className="form-grid">
                 <div className="form-field">
-                  <label className="form-label">Client Email</label>
+                  <label className="form-label">Influencer Email</label>
                   <input
                     type="email"
                     name="clientEmail"
                     value={form.clientEmail}
                     onChange={handleChange}
                     required
-                    placeholder="client@brand.com"
+                    placeholder="creator@example.com"
                     className="form-input"
                   />
                 </div>
@@ -201,7 +201,7 @@ export default function NewContractPage() {
                 </div>
                 <div>
                   <h2 className="form-section-title">Campaign Details</h2>
-                  <p className="form-section-subtitle">What will you create?</p>
+                  <p className="form-section-subtitle">What should the creator deliver?</p>
                 </div>
               </div>
               
@@ -271,7 +271,7 @@ export default function NewContractPage() {
                 </div>
                 <div>
                   <h2 className="form-section-title">Payment Terms</h2>
-                  <p className="form-section-subtitle">How and when will you get paid?</p>
+                  <p className="form-section-subtitle">What payment terms are you offering?</p>
                 </div>
               </div>
               
@@ -441,7 +441,7 @@ export default function NewContractPage() {
                   </>
                 ) : (
                   <>
-                    Send contract to client
+                    Send contract to influencer
                     <svg className="form-submit-icon" viewBox="0 0 20 20" fill="none">
                       <path d="M3 10h14M11 6l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
