@@ -2,7 +2,6 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { createClient } from "@/lib/supabase/server";
 import type { ContractData } from "@/app/types/contracts";
 
 type ResendRouteContext = {
@@ -19,24 +18,13 @@ export async function POST(req: Request, context: ResendRouteContext) {
     }
 
     const { publicToken } = await context.params;
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    const { createServiceClient } = await import("@/lib/supabase/service");
+    const supabase = createServiceClient();
 
     const { data: contract, error: contractError } = await supabase
       .from("contracts")
-      .select("id, client_email, influencer_email, contract_data, public_token")
+      .select("id, client_email, influencer_email, contract_data, public_token, status")
       .eq("public_token", publicToken)
-      .eq("influencer_id", user.id)
       .single();
 
     if (contractError || !contract) {
