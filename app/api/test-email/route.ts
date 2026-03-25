@@ -3,6 +3,26 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
+export async function GET(req: Request) {
+  const origin = new URL(req.url).origin;
+  const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL || null;
+
+  return NextResponse.json({
+    success: true,
+    environment: process.env.VERCEL_ENV || process.env.NODE_ENV || "unknown",
+    origin,
+    configuredAppUrl,
+    appUrlMatchesOrigin: configuredAppUrl === origin,
+    env: {
+      NEXT_PUBLIC_SUPABASE_URL: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+      SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+      RESEND_API_KEY: Boolean(process.env.RESEND_API_KEY),
+      RESEND_FROM_EMAIL: Boolean(process.env.RESEND_FROM_EMAIL),
+    },
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
