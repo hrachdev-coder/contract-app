@@ -11,10 +11,12 @@ export default function ResendContractButton({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
 
   const handleResend = async () => {
     setLoading(true);
     setError(null);
+    setSent(false);
     try {
       const res = await fetch(`/api/contract/${publicToken}/resend`, {
         method: "POST",
@@ -26,6 +28,7 @@ export default function ResendContractButton({
         return;
       }
 
+      setSent(true);
       router.refresh();
     } finally {
       setLoading(false);
@@ -37,12 +40,13 @@ export default function ResendContractButton({
       <button
         type="button"
         onClick={handleResend}
-        disabled={loading}
+        disabled={loading || sent}
         className="btn-resend disabled:opacity-50"
       >
-        {loading ? "Resending..." : "Resend"}
+        {loading ? "Sending..." : sent ? "Sent ✓" : "Resend to creator"}
       </button>
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {sent ? <p className="text-xs text-green-600">Creator notified by email.</p> : null}
     </div>
   );
 }

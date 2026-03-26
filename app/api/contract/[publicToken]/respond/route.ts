@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 
 import { createServiceClient } from "@/lib/supabase/service";
 import type { ContractData } from "@/app/types/contracts";
@@ -98,6 +99,35 @@ export async function POST(req: Request, context: RespondRouteContext) {
           { success: false, message: updateError.message },
           { status: 500 }
         );
+      }
+
+      // Notify the brand that the influencer has requested changes.
+      if (process.env.RESEND_API_KEY && contract.influencer_email) {
+        try {
+          const resend = new Resend(process.env.RESEND_API_KEY);
+          const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+            const baseUrl = new URL(req.url).origin;
+            const reviewUrl = `${baseUrl}/contract/${contract.public_token}`;
+          await resend.emails.send({
+            from: fromEmail,
+            to: contract.influencer_email,
+            subject: `Changes requested on your contract - ${nextData.brandName || "Contract"}`,
+            html: `
+              <p>Hello,</p>
+              <p>The creator has reviewed your contract and requested changes.</p>
+              ${feedback ? `<p><strong>Their feedback:</strong> ${feedback}</p>` : ""}
+                <p>Review the contract and send an updated version to the creator:</p>
+                <p>
+                  <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer">
+                    Review &amp; send updated contract
+                  </a>
+                </p>
+                <p style="word-break: break-all;">${reviewUrl}</p>
+            `,
+          });
+        } catch {
+          // Non-critical — proceed even if notification email fails.
+        }
       }
 
       return NextResponse.json({ success: true, status: "changes_requested" });

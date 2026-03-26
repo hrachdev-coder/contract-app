@@ -74,10 +74,11 @@ export async function POST(req: Request, context: ResendRouteContext) {
     const result = await resend.emails.send({
       from: fromEmail,
       to: contract.client_email,
-      subject: `Updated campaign contract from ${employerName}`,
+      subject: `Your requested changes were approved — ${employerName}`,
       html: `
         <p>Hello,</p>
-        <p><b>${employerName}</b> has sent you an updated contract to review.</p>
+        <p><b>${employerName}</b> has reviewed your requested changes and sent you an updated contract.</p>
+        <p>Please review the updated terms and accept or request further edits.</p>
         <p>
           <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer">
             Review updated contract
