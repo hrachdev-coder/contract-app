@@ -36,7 +36,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const isCompleted = useMemo(() => status === "completed", [status]);
+  const isFinalized = useMemo(() => status === "accepted" || status === "completed", [status]);
   const canSendUpdatedContract = useMemo(() => status === "changes_requested", [status]);
 
   const handleFormChange =
@@ -81,8 +81,8 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         setStatus("changes_requested");
         setSuccess("Your requested edits were sent back to the brand.");
       } else {
-        setStatus("completed");
-        setSuccess("Contract accepted and marked as completed.");
+        setStatus("accepted");
+        setSuccess("Contract accepted. The brand will send the final PDF.");
       }
 
       router.refresh();
@@ -178,42 +178,42 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         <div style={{ marginTop: "24px", display: "grid", gap: "14px" }}>
           <label style={{ display: "grid", gap: "6px" }}>
             Brand name
-            <input value={form.brandName} onChange={handleFormChange("brandName")} disabled={isCompleted} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+            <input value={form.brandName} onChange={handleFormChange("brandName")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
           </label>
 
           <label style={{ display: "grid", gap: "6px" }}>
             Platform
-            <input value={form.platform} onChange={handleFormChange("platform")} disabled={isCompleted} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+            <input value={form.platform} onChange={handleFormChange("platform")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
           </label>
 
           <label style={{ display: "grid", gap: "6px" }}>
             Deliverables
-            <textarea value={form.deliverables} onChange={handleFormChange("deliverables")} disabled={isCompleted} style={{ minHeight: "90px", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+            <textarea value={form.deliverables} onChange={handleFormChange("deliverables")} disabled={isFinalized} style={{ minHeight: "90px", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
           </label>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <label style={{ display: "grid", gap: "6px" }}>
               Campaign start
-              <input type="date" value={form.campaignStartDate} onChange={handleFormChange("campaignStartDate")} disabled={isCompleted} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <input type="date" value={form.campaignStartDate} onChange={handleFormChange("campaignStartDate")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
             </label>
             <label style={{ display: "grid", gap: "6px" }}>
               Campaign end
-              <input type="date" value={form.campaignEndDate} onChange={handleFormChange("campaignEndDate")} disabled={isCompleted} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <input type="date" value={form.campaignEndDate} onChange={handleFormChange("campaignEndDate")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
             </label>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
             <label style={{ display: "grid", gap: "6px" }}>
               Payment amount
-              <input type="number" value={form.paymentAmount} onChange={handleFormChange("paymentAmount")} disabled={isCompleted} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <input type="number" value={form.paymentAmount} onChange={handleFormChange("paymentAmount")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
             </label>
             <label style={{ display: "grid", gap: "6px" }}>
               Currency
-              <input value={form.currency} onChange={handleFormChange("currency")} disabled={isCompleted} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <input value={form.currency} onChange={handleFormChange("currency")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
             </label>
             <label style={{ display: "grid", gap: "6px" }}>
               Payment deadline (days)
-              <input type="number" value={form.paymentDeadlineDays} onChange={handleFormChange("paymentDeadlineDays")} disabled={isCompleted} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <input type="number" value={form.paymentDeadlineDays} onChange={handleFormChange("paymentDeadlineDays")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
             </label>
           </div>
 
@@ -222,7 +222,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
             <textarea
               value={feedback}
               onChange={(event) => setFeedback(event.target.value)}
-              disabled={isCompleted}
+              disabled={isFinalized}
               style={{ minHeight: "110px", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }}
               placeholder="Describe changes you want before approval"
             />
@@ -232,7 +232,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         {error && <p style={{ color: "#b91c1c", marginTop: "16px" }}>{error}</p>}
         {success && <p style={{ color: "#166534", marginTop: "16px" }}>{success}</p>}
 
-        {!isCompleted && (
+        {!isFinalized && (
           <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
             {canSendUpdatedContract ? (
               <button

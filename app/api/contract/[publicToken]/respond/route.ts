@@ -106,7 +106,7 @@ export async function POST(req: Request, context: RespondRouteContext) {
     const { error: completeError } = await supabase
       .from("contracts")
       .update({
-        status: "completed",
+        status: "accepted",
       })
       .eq("id", contract.id);
 
@@ -117,7 +117,7 @@ export async function POST(req: Request, context: RespondRouteContext) {
       );
     }
 
-    return NextResponse.json({ success: true, status: "completed" });
+    return NextResponse.json({ success: true, status: "accepted" });
   } catch (error) {
     return NextResponse.json(
       {

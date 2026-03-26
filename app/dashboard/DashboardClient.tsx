@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ResendContractButton from "../components/ResendContractButton";
+import FinalizeContractButton from "../components/FinalizeContractButton";
 import DeleteContractButton from "../components/DeleteContractButton";
 import LogoutButton from "../components/LogoutButton";
 import type { ContractStatus } from "@/app/types/contracts";
@@ -23,7 +24,7 @@ type Contract = {
 function normalizeStatus(status: string): ContractStatus {
   if (status === "pending") return "sent";
   if (status === "signed") return "completed";
-  if (status === "accepted") return "completed";
+  if (status === "accepted") return "accepted";
   if (status === "needs_changes") return "changes_requested";
   if (status === "viewed") return "viewed";
   if (status === "changes_requested") return "changes_requested";
@@ -307,6 +308,12 @@ export default function DashboardClient() {
                             Review link is missing for this contract. Please create a new contract.
                           </p>
                         )}
+                      </div>
+                    )}
+
+                    {normalizedStatus === "accepted" && (
+                      <div className="contract-actions">
+                        <FinalizeContractButton contractId={contract.id} />
                       </div>
                     )}
 
