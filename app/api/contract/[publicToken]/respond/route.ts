@@ -1,10 +1,8 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 
 import { createServiceClient } from "@/lib/supabase/service";
-import { generateContractPdfBuffer } from "@/lib/contract/generateContractPdf";
 import type { ContractData } from "@/app/types/contracts";
 
 type RespondRouteContext = {
@@ -105,43 +103,6 @@ export async function POST(req: Request, context: RespondRouteContext) {
       return NextResponse.json({ success: true, status: "changes_requested" });
     }
 
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json(
-        { success: false, message: "RESEND_API_KEY is not configured" },
-        { status: 500 }
-      );
-    }
-
-    const contractData = normalizeContractData(contract.contract_data || {}, contract.client_email);
-    const employerName = contract.influencer_email || "Influencer";
-
-    const pdfBuffer = await generateContractPdfBuffer({
-      employerName,
-      contractData,
-    });
-
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
-    const recipients = [contract.client_email, contract.influencer_email]
-      .filter((email): email is string => Boolean(email));
-
-    const emailResult = await resend.emails.send({
-      from: fromEmail,
-      to: recipients,
-      subject: `Final contract PDF - ${contractData.brandName || "Contract"}`,
-      html: `
-        <p>Hello,</p>
-        <p>The contract has been accepted and finalized.</p>
-        <p>The final PDF is attached to this email.</p>
-      `,
-      attachments: [
-        {
-          filename: "final-contract.pdf",
-          content: pdfBuffer.toString("base64"),
-        },
-      ],
-    });
-
     const { error: completeError } = await supabase
       .from("contracts")
       .update({
@@ -156,7 +117,7 @@ export async function POST(req: Request, context: RespondRouteContext) {
       );
     }
 
-    return NextResponse.json({ success: true, status: "completed", emailResult });
+    return NextResponse.json({ success: true, status: "completed" });
   } catch (error) {
     return NextResponse.json(
       {

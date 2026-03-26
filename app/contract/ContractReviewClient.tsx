@@ -82,7 +82,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         setSuccess("Your requested edits were sent back to the brand.");
       } else {
         setStatus("completed");
-        setSuccess("Contract accepted. Final PDF was emailed to both you and the brand.");
+        setSuccess("Contract accepted and marked as completed.");
       }
 
       router.refresh();
