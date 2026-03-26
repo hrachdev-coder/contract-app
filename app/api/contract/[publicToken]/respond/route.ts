@@ -63,10 +63,10 @@ export async function POST(req: Request, context: RespondRouteContext) {
       );
     }
 
-    // Prevent any action on an already-completed contract to avoid duplicate PDFs.
-    if (contract.status === "completed") {
+    // Prevent any action on a finalized contract.
+    if (contract.status === "completed" || contract.status === "accepted") {
       return NextResponse.json(
-        { success: false, message: "Contract is already completed" },
+        { success: false, message: "Contract is already finalized" },
         { status: 409 }
       );
     }

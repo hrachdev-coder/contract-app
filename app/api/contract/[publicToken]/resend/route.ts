@@ -34,6 +34,13 @@ export async function POST(req: Request, context: ResendRouteContext) {
       );
     }
 
+    if (contract.status === "accepted" || contract.status === "completed") {
+      return NextResponse.json(
+        { success: false, message: "Contract is already finalized" },
+        { status: 409 }
+      );
+    }
+
     let incomingContractData: ContractData | null = null;
     try {
       const body = await req.json();
