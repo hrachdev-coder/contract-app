@@ -71,7 +71,7 @@ export async function POST(req: Request, context: ResendRouteContext) {
     const reviewUrl = `${baseUrl}/contract/${contract.public_token}`;
     const employerName = contract.influencer_email || "Your brand contact";
 
-    const result = await resend.emails.send({
+    const emailSendResult = await resend.emails.send({
       from: fromEmail,
       to: contract.client_email,
       subject: `Your requested changes were approved — ${employerName}`,
@@ -89,12 +89,27 @@ export async function POST(req: Request, context: ResendRouteContext) {
       `,
     });
 
+    if (emailSendResult.error) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: emailSendResult.error.message || "Failed to send creator notification",
+        },
+        { status: 502 }
+      );
+    }
+
     await supabase
       .from("contracts")
       .update({ status: "updated", feedback: null })
       .eq("id", contract.id);
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({
+      success: true,
+      data: emailSendResult.data,
+      recipient: contract.client_email,
+      status: "updated",
+    });
   } catch (error) {
     return NextResponse.json(
       {
