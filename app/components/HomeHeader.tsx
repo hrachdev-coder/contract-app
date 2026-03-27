@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, getUserOrNull } from "@/lib/supabase/client";
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
 
@@ -19,8 +19,8 @@ export default function HomeHeader() {
     const supabase = createClient();
 
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
+      const nextUser = await getUserOrNull(supabase);
+      setUser(nextUser);
     };
 
     getUser();

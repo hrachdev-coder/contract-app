@@ -1,11 +1,97 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, getUserOrNull } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import "../../contract-form.css";
 import "../../home.css";
 import HomeHeader from "../../components/HomeHeader";
+
+type TemplateId = "blank" | "instagram" | "tiktok" | "youtube" | "blog";
+
+type ContractTemplate = {
+  id: TemplateId;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  defaults: Partial<FormState>;
+};
+
+const CONTRACT_TEMPLATES: ContractTemplate[] = [
+  {
+    id: "blank",
+    name: "Blank",
+    description: "Start from scratch",
+    icon: "✏️",
+    color: "#64748b",
+    defaults: {},
+  },
+  {
+    id: "instagram",
+    name: "Instagram",
+    description: "Feed posts, Reels & Stories",
+    icon: "📸",
+    color: "#e1306c",
+    defaults: {
+      platform: "Instagram",
+      deliverables: "1 Instagram Feed Post, 3 Instagram Stories, 1 Reel",
+      usageRights: "organic_only",
+      revisions: "1",
+      paymentDeadlineDays: "30",
+      exclusivity: false,
+      exclusivityDuration: "",
+    },
+  },
+  {
+    id: "tiktok",
+    name: "TikTok",
+    description: "Short-form video content",
+    icon: "🎬",
+    color: "#010101",
+    defaults: {
+      platform: "TikTok",
+      deliverables: "2 TikTok videos (min. 30 seconds each)",
+      usageRights: "organic_only",
+      revisions: "2",
+      paymentDeadlineDays: "30",
+      exclusivity: false,
+      exclusivityDuration: "",
+    },
+  },
+  {
+    id: "youtube",
+    name: "YouTube",
+    description: "Dedicated video or integration",
+    icon: "▶️",
+    color: "#ff0000",
+    defaults: {
+      platform: "YouTube",
+      deliverables: "1 dedicated YouTube video (min. 10 min) with product integration",
+      usageRights: "paid_ads",
+      revisions: "2",
+      paymentDeadlineDays: "14",
+      exclusivity: false,
+      exclusivityDuration: "",
+    },
+  },
+  {
+    id: "blog",
+    name: "Blog",
+    description: "Written article or review",
+    icon: "📝",
+    color: "#10b981",
+    defaults: {
+      platform: "Blog",
+      deliverables: "1 sponsored blog article (min. 800 words) with product review",
+      usageRights: "full_buyout",
+      revisions: "1",
+      paymentDeadlineDays: "30",
+      exclusivity: false,
+      exclusivityDuration: "",
+    },
+  },
+];
 
 type FormState = {
   clientEmail: string;
@@ -29,6 +115,7 @@ export default function NewContractPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId | null>(null);
 
   const [form, setForm] = useState<FormState>({
     clientEmail: "",
@@ -45,6 +132,15 @@ export default function NewContractPage() {
     exclusivity: false,
     exclusivityDuration: "",
   });
+
+  const handleTemplateSelect = (template: ContractTemplate) => {
+    setSelectedTemplate(template.id);
+    if (template.id === "blank") return;
+    setForm((prev) => ({
+      ...prev,
+      ...template.defaults,
+    }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -68,9 +164,7 @@ export default function NewContractPage() {
     setLoading(true);
     setError(null);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getUserOrNull(supabase);
 
     if (!user) {
       setLoading(false);
@@ -147,6 +241,33 @@ export default function NewContractPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="contract-form">
+
+            {/* Template Selector */}
+            <div className="template-selector-section">
+              <div className="template-selector-header">
+                <h2 className="template-selector-title">Choose a template</h2>
+                <p className="template-selector-subtitle">Start with a pre-filled contract or build from scratch</p>
+              </div>
+              <div className="template-cards">
+                {CONTRACT_TEMPLATES.map((template) => (
+                  <button
+                    key={template.id}
+                    type="button"
+                    className={`template-card${selectedTemplate === template.id ? " template-card--selected" : ""}`}
+                    style={{ "--template-color": template.color } as React.CSSProperties}
+                    onClick={() => handleTemplateSelect(template)}
+                  >
+                    <span className="template-card-icon">{template.icon}</span>
+                    <span className="template-card-name">{template.name}</span>
+                    <span className="template-card-desc">{template.description}</span>
+                    {selectedTemplate === template.id && (
+                      <span className="template-card-check">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Influencer Information */}
             <div className="form-section">
               <div className="form-section-header">

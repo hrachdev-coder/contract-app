@@ -34,16 +34,20 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Invalid or missing refresh token: treat as signed out.
+  }
 
-  // Եթե user չկա և փորձում է dashboard մտնել
+  // If user is missing and tries to open a protected dashboard route.
   if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Եթե user կա և login/register էջ է բացում
+  // If user exists and opens auth pages, redirect to dashboard.
   if (
     user &&
     (request.nextUrl.pathname === "/login" ||

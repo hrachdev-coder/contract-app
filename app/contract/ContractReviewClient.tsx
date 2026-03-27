@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { ContractData } from "@/app/types/contracts";
+import { buildContractSections, formatContractDate } from "@/lib/contract/contractTerms";
 
 type ContractReviewClientProps = {
   publicToken: string;
@@ -38,6 +39,20 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
 
   const isFinalized = useMemo(() => status === "accepted" || status === "completed", [status]);
   const canSendUpdatedContract = useMemo(() => status === "changes_requested", [status]);
+  const representativeName = useMemo(
+    () => props.influencerEmail || form.brandName || "Brand Representative",
+    [props.influencerEmail, form.brandName]
+  );
+  const contractSections = useMemo(
+    () =>
+      buildContractSections({
+        employerName: representativeName,
+        creatorEmail: props.clientEmail,
+        contractData: form,
+        createdAt: props.createdAt,
+      }),
+    [representativeName, props.clientEmail, props.createdAt, form]
+  );
 
   const handleFormChange =
     (key: keyof ContractData) =>
@@ -170,10 +185,56 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         </div>
 
         <div style={{ marginTop: "18px", display: "grid", gap: "10px" }}>
-          <div><strong>From brand:</strong> {props.influencerEmail || "Unknown"}</div>
+          <div><strong>From brand:</strong> {representativeName}</div>
           <div><strong>For creator:</strong> {props.clientEmail}</div>
-          <div><strong>Created:</strong> {new Date(props.createdAt).toLocaleDateString()}</div>
+          <div><strong>Created:</strong> {formatContractDate(props.createdAt)}</div>
         </div>
+
+        <article
+          style={{
+            marginTop: "24px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "12px",
+            padding: "18px",
+            background: "#f8fafc",
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: "20px" }}>Influencer Campaign Agreement</h2>
+          <p style={{ marginTop: "8px", color: "#475569", lineHeight: 1.7 }}>
+            This contract draft is generated from your selected terms. You can edit the fields below and the agreement text updates automatically.
+          </p>
+
+          <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
+            {contractSections.map((section) => (
+              <section key={section.title}>
+                <h3 style={{ margin: 0, fontSize: "15px" }}>{section.title}</h3>
+                <p style={{ marginTop: "6px", marginBottom: 0, color: "#334155", lineHeight: 1.75 }}>
+                  {section.body}
+                </p>
+              </section>
+            ))}
+          </div>
+
+          <div
+            style={{
+              marginTop: "20px",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "14px",
+            }}
+          >
+            <div style={{ borderTop: "1px dashed #94a3b8", paddingTop: "8px", color: "#475569" }}>
+              <div style={{ fontWeight: 600 }}>{representativeName}</div>
+              <div>Brand Representative</div>
+            </div>
+            <div style={{ borderTop: "1px dashed #94a3b8", paddingTop: "8px", color: "#475569" }}>
+              <div style={{ fontWeight: 600 }}>{props.clientEmail}</div>
+              <div>Creator</div>
+            </div>
+          </div>
+        </article>
+
+        <h2 style={{ marginTop: "24px", marginBottom: "8px", fontSize: "20px" }}>Edit Contract Terms</h2>
 
         <div style={{ marginTop: "24px", display: "grid", gap: "14px" }}>
           <label style={{ display: "grid", gap: "6px" }}>

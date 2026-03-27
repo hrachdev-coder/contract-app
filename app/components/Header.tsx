@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, getUserOrNull } from "@/lib/supabase/client";
 import Link from "next/link";
 
 export default function Header() {
@@ -18,8 +18,8 @@ export default function Header() {
     const supabase = createClient();
 
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
+      const nextUser = await getUserOrNull(supabase);
+      setUser(nextUser);
     };
 
     getUser();

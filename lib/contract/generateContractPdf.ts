@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 
 import type { ContractData } from "@/app/types/contracts";
+import { buildContractSections, formatContractDate } from "@/lib/contract/contractTerms";
 
 export async function generateContractPdfBuffer(args: {
   employerName: string;
@@ -26,34 +27,54 @@ export async function generateContractPdfBuffer(args: {
     buffers.push(chunk as Buffer);
   });
 
-  doc.fontSize(24).text("Contract Agreement", { align: "center", underline: true });
+  const representativeName = employerName || contractData.brandName || "Brand Representative";
+  const contractSections = buildContractSections({
+    employerName: representativeName,
+    creatorEmail: contractData.clientEmail,
+    contractData,
+    createdAt: contractData.campaignStartDate,
+  });
+
+  doc.fontSize(24).text("Influencer Campaign Agreement", { align: "center", underline: true });
   doc.moveDown();
+  doc
+    .fontSize(10)
+    .fillColor("#475569")
+    .text(`Generated on ${formatContractDate(new Date().toISOString().slice(0, 10))}`, {
+      align: "center",
+    });
+  doc.moveDown(1.2);
 
-  doc.fontSize(12).text(`Employer: ${employerName}`);
-  doc.text(`Client Email: ${contractData.clientEmail}`);
-  doc.text(`Brand Name: ${contractData.brandName}`);
-  doc.text(`Platform: ${contractData.platform}`);
-  doc.text(`Deliverables: ${contractData.deliverables}`);
-  doc.text(`Campaign Start: ${contractData.campaignStartDate}`);
-  doc.text(`Campaign End: ${contractData.campaignEndDate}`);
-  doc.text(
-    `Payment: ${contractData.paymentAmount} ${contractData.currency}`
-  );
-  doc.text(
-    `Payment Deadline (days): ${contractData.paymentDeadlineDays}`
-  );
-  doc.text(`Usage Rights: ${contractData.usageRights}`);
-  doc.text(`Revisions: ${contractData.revisions}`);
+  doc.fillColor("#0f172a").fontSize(11);
 
-  if (contractData.exclusivity) {
-    doc.text(`Exclusivity: Yes`);
-    doc.text(`Exclusivity Duration: ${contractData.exclusivityDuration}`);
-  } else {
-    doc.text(`Exclusivity: No`);
-  }
+  contractSections.forEach((section) => {
+    doc.fontSize(12).fillColor("#0f172a").text(section.title, {
+      underline: false,
+    });
+    doc.moveDown(0.3);
+    doc.fontSize(11).fillColor("#334155").text(section.body, {
+      align: "justify",
+      lineGap: 2,
+    });
+    doc.moveDown(0.9);
+  });
 
-  doc.moveDown();
-  doc.text("Thank you for your cooperation.", { align: "center" });
+  doc.moveDown(0.8);
+  doc.fontSize(12).fillColor("#0f172a").text("Signatures", { underline: false });
+  doc.moveDown(0.6);
+
+  doc.fontSize(11).fillColor("#334155").text("Brand Representative:");
+  doc.moveDown(0.2);
+  doc.text(`${representativeName}`);
+  doc.moveDown(0.2);
+  doc.text("Signature: _________________________   Date: __________________");
+  doc.moveDown(0.9);
+
+  doc.text("Creator:");
+  doc.moveDown(0.2);
+  doc.text(`${contractData.clientEmail || "Creator"}`);
+  doc.moveDown(0.2);
+  doc.text("Signature: _________________________   Date: __________________");
 
   await new Promise<void>((resolve, reject) => {
     doc.on("end", () => resolve());

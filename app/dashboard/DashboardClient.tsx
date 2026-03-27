@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, getUserOrNull } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ResendContractButton from "../components/ResendContractButton";
@@ -89,7 +89,7 @@ export default function DashboardClient() {
     }
 
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getUserOrNull(supabase);
       if (!user) {
         router.push("/login");
         return;
@@ -103,7 +103,11 @@ export default function DashboardClient() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || event === "TOKEN_REFRESHED" && !session) {
+        router.push("/login");
+        return;
+      }
       const nextUser = session?.user ?? null;
       userIdRef.current = nextUser?.id ?? null;
       setUser(nextUser);
@@ -112,6 +116,7 @@ export default function DashboardClient() {
       } else {
         setContracts([]);
         setLoading(false);
+        router.push("/login");
       }
     });
 
