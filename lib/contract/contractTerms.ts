@@ -1,4 +1,5 @@
 import type { ContractData } from "@/app/types/contracts";
+import { getContractTemplateById } from "@/lib/contract/templates";
 
 export type ContractSection = {
   title: string;
@@ -39,6 +40,7 @@ export function buildContractSections(args: {
   const brandName = fallback(contractData.brandName, "Brand");
   const employer = fallback(employerName, "Brand Representative");
   const creator = fallback(creatorEmail, "Creator");
+  const template = getContractTemplateById(contractData.contractTemplate);
   const platform = fallback(contractData.platform, "Not specified");
   const deliverables = fallback(contractData.deliverables, "Not specified");
   const campaignStart = formatContractDate(contractData.campaignStartDate);
@@ -59,7 +61,7 @@ export function buildContractSections(args: {
   return [
     {
       title: "1. Parties",
-      body: `This Influencer Campaign Agreement (the \"Agreement\") is entered into on ${effectiveDate} between ${brandName} (represented by ${employer}) and the Creator (${creator}).`,
+      body: `This Influencer Campaign Agreement (the \"Agreement\") is entered into on ${effectiveDate} between ${brandName} (represented by ${employer}) and the Creator (${creator}). This agreement is based on the ${template.name} campaign template selected by the Brand.`,
     },
     {
       title: "2. Scope of Work",

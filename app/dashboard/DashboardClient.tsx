@@ -4,22 +4,30 @@ import { useEffect, useRef, useState } from "react";
 import { createClient, getUserOrNull } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import type { User } from "@supabase/supabase-js";
 import ResendContractButton from "../components/ResendContractButton";
 import FinalizeContractButton from "../components/FinalizeContractButton";
 import DeleteContractButton from "../components/DeleteContractButton";
 import LogoutButton from "../components/LogoutButton";
-import type { ContractStatus } from "@/app/types/contracts";
+import type { ContractData, ContractStatus } from "@/app/types/contracts";
+import { getContractTemplateById } from "@/lib/contract/templates";
 import "./dashboard.css";
 import "../home.css";
 
 type Contract = {
   id: string;
   client_email: string;
-  contract_data: any;
+  contract_data: ContractData | null;
   status: string;
   created_at: string;
   public_token: string | null;
 };
+
+declare global {
+  interface Window {
+    refreshDashboard?: () => void;
+  }
+}
 
 function normalizeStatus(status: string): ContractStatus {
   if (status === "pending") return "sent";
@@ -36,7 +44,7 @@ function normalizeStatus(status: string): ContractStatus {
 export default function DashboardClient() {
   const router = useRouter();
   const supabase = createClient();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,7 +89,7 @@ export default function DashboardClient() {
   useEffect(() => {
     // Register the global refresh helper once
     if (typeof window !== 'undefined') {
-      (window as any).refreshDashboard = () => {
+      window.refreshDashboard = () => {
         if (userIdRef.current) {
           void fetchContracts(userIdRef.current);
         }
@@ -120,7 +128,12 @@ export default function DashboardClient() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      if (typeof window !== "undefined") {
+        window.refreshDashboard = undefined;
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -150,9 +163,9 @@ export default function DashboardClient() {
             <span className="logo-text">Contrakt</span>
           </Link>
           <div className="nav-links">
-            <a href="/#features" className="nav-link">Features</a>
-            <a href="/#how-it-works" className="nav-link">How it works</a>
-            <a href="/#reviews" className="nav-link">Reviews</a>
+            <Link href="/#features" className="nav-link">Features</Link>
+            <Link href="/#how-it-works" className="nav-link">How it works</Link>
+            <Link href="/#reviews" className="nav-link">Reviews</Link>
             <div className="nav-divider" />
             <Link href="/dashboard" className="btn-ghost">Dashboard</Link>
             <LogoutButton />
@@ -247,6 +260,9 @@ export default function DashboardClient() {
               {contracts.map((contract) => {
                 const normalizedStatus = normalizeStatus(contract.status);
                 const meta = statusMeta[normalizedStatus] ?? statusMeta.sent;
+                const template = getContractTemplateById(
+                  contract.contract_data?.contractTemplate || "blank"
+                );
 
                 return (
                   <div key={contract.id} className="contract-card" data-contract-id={contract.id}>
@@ -256,6 +272,9 @@ export default function DashboardClient() {
                           {contract.contract_data?.brandName || "Untitled Contract"}
                         </h3>
                         <p className="contract-email">{contract.client_email}</p>
+                        <p className="contract-date" style={{ marginTop: "6px" }}>
+                          {template.name} Template
+                        </p>
                         <p className="contract-date">
                           {new Date(contract.created_at).toLocaleDateString('en-US', {
                             year: 'numeric',

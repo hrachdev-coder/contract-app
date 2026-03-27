@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import type { ContractData } from "@/app/types/contracts";
+import { normalizeContractData } from "@/lib/contract/schema";
 
 type ResendRouteContext = {
   params: Promise<{ publicToken: string }>;
@@ -45,7 +46,10 @@ export async function POST(req: Request, context: ResendRouteContext) {
     try {
       const body = await req.json();
       if (body && typeof body.contractData === "object") {
-        incomingContractData = body.contractData as ContractData;
+        incomingContractData = normalizeContractData(
+          body.contractData as Partial<ContractData>,
+          contract.client_email
+        );
       }
     } catch {
       // No JSON body is expected for the default resend button flow.

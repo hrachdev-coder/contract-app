@@ -3,6 +3,9 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
+import { normalizeContractData } from "@/lib/contract/schema";
+import { getContractTemplateById } from "@/lib/contract/templates";
+
 export async function POST(req: Request) {
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -31,6 +34,9 @@ export async function POST(req: Request) {
       );
     }
 
+    const normalizedContractData = normalizeContractData(contractData, email);
+  const template = getContractTemplateById(normalizedContractData.contractTemplate);
+
     const baseUrl = new URL(req.url).origin;
     const reviewUrl = `${baseUrl}/contract/${publicToken}`;
 
@@ -45,6 +51,7 @@ export async function POST(req: Request) {
       html: `
         <p>Hello,</p>
         <p><b>${employerName}</b> has sent you a campaign contract to review.</p>
+        <p><b>Template:</b> ${template.name}</p>
         <p>
           <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer">
             Review contract

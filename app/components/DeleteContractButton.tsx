@@ -41,7 +41,7 @@ export default function DeleteContractButton({
         onDeleted?.(contractId);
         router.refresh();
       }
-    } catch (error) {
+    } catch {
       setError("Delete failed");
     } finally {
       setLoading(false);

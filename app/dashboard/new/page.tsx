@@ -3,111 +3,12 @@
 import { useState } from "react";
 import { createClient, getUserOrNull } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import type { ContractData } from "@/app/types/contracts";
+import { createEmptyContractData } from "@/lib/contract/schema";
+import { CONTRACT_TEMPLATES, type ContractTemplate } from "@/lib/contract/templates";
 import "../../contract-form.css";
 import "../../home.css";
 import HomeHeader from "../../components/HomeHeader";
-
-type TemplateId = "blank" | "instagram" | "tiktok" | "youtube" | "blog";
-
-type ContractTemplate = {
-  id: TemplateId;
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
-  defaults: Partial<FormState>;
-};
-
-const CONTRACT_TEMPLATES: ContractTemplate[] = [
-  {
-    id: "blank",
-    name: "Blank",
-    description: "Start from scratch",
-    icon: "✏️",
-    color: "#64748b",
-    defaults: {},
-  },
-  {
-    id: "instagram",
-    name: "Instagram",
-    description: "Feed posts, Reels & Stories",
-    icon: "📸",
-    color: "#e1306c",
-    defaults: {
-      platform: "Instagram",
-      deliverables: "1 Instagram Feed Post, 3 Instagram Stories, 1 Reel",
-      usageRights: "organic_only",
-      revisions: "1",
-      paymentDeadlineDays: "30",
-      exclusivity: false,
-      exclusivityDuration: "",
-    },
-  },
-  {
-    id: "tiktok",
-    name: "TikTok",
-    description: "Short-form video content",
-    icon: "🎬",
-    color: "#010101",
-    defaults: {
-      platform: "TikTok",
-      deliverables: "2 TikTok videos (min. 30 seconds each)",
-      usageRights: "organic_only",
-      revisions: "2",
-      paymentDeadlineDays: "30",
-      exclusivity: false,
-      exclusivityDuration: "",
-    },
-  },
-  {
-    id: "youtube",
-    name: "YouTube",
-    description: "Dedicated video or integration",
-    icon: "▶️",
-    color: "#ff0000",
-    defaults: {
-      platform: "YouTube",
-      deliverables: "1 dedicated YouTube video (min. 10 min) with product integration",
-      usageRights: "paid_ads",
-      revisions: "2",
-      paymentDeadlineDays: "14",
-      exclusivity: false,
-      exclusivityDuration: "",
-    },
-  },
-  {
-    id: "blog",
-    name: "Blog",
-    description: "Written article or review",
-    icon: "📝",
-    color: "#10b981",
-    defaults: {
-      platform: "Blog",
-      deliverables: "1 sponsored blog article (min. 800 words) with product review",
-      usageRights: "full_buyout",
-      revisions: "1",
-      paymentDeadlineDays: "30",
-      exclusivity: false,
-      exclusivityDuration: "",
-    },
-  },
-];
-
-type FormState = {
-  clientEmail: string;
-  brandName: string;
-  platform: string;
-  deliverables: string;
-  campaignStartDate: string;
-  campaignEndDate: string;
-  paymentAmount: string;
-  currency: string;
-  paymentDeadlineDays: string;
-  usageRights: string;
-  revisions: string;
-  exclusivity: boolean;
-  exclusivityDuration: string;
-};
 
 export default function NewContractPage() {
   const router = useRouter();
@@ -115,29 +16,12 @@ export default function NewContractPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId | null>(null);
-
-  const [form, setForm] = useState<FormState>({
-    clientEmail: "",
-    brandName: "",
-    platform: "",
-    deliverables: "",
-    campaignStartDate: "",
-    campaignEndDate: "",
-    paymentAmount: "",
-    currency: "USD",
-    paymentDeadlineDays: "30",
-    usageRights: "organic_only",
-    revisions: "1",
-    exclusivity: false,
-    exclusivityDuration: "",
-  });
+  const [form, setForm] = useState<ContractData>(createEmptyContractData());
 
   const handleTemplateSelect = (template: ContractTemplate) => {
-    setSelectedTemplate(template.id);
-    if (template.id === "blank") return;
     setForm((prev) => ({
       ...prev,
+      contractTemplate: template.id,
       ...template.defaults,
     }));
   };
@@ -207,10 +91,12 @@ export default function NewContractPage() {
         }),
       });
 
-      const emailData = await emailRes.json().catch(() => ({}));
+      const emailData: { message?: string } = await emailRes
+        .json()
+        .catch(() => ({}));
 
       if (!emailRes.ok) {
-        const msg = (emailData as any)?.message || "Unknown email error";
+        const msg = emailData.message || "Unknown email error";
         console.error("Email failed:", msg);
         setError("Contract saved but email failed: " + msg);
         setLoading(false);
@@ -253,14 +139,14 @@ export default function NewContractPage() {
                   <button
                     key={template.id}
                     type="button"
-                    className={`template-card${selectedTemplate === template.id ? " template-card--selected" : ""}`}
+                    className={`template-card${form.contractTemplate === template.id ? " template-card--selected" : ""}`}
                     style={{ "--template-color": template.color } as React.CSSProperties}
                     onClick={() => handleTemplateSelect(template)}
                   >
                     <span className="template-card-icon">{template.icon}</span>
                     <span className="template-card-name">{template.name}</span>
                     <span className="template-card-desc">{template.description}</span>
-                    {selectedTemplate === template.id && (
+                    {form.contractTemplate === template.id && (
                       <span className="template-card-check">✓</span>
                     )}
                   </button>

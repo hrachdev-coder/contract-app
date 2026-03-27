@@ -6,7 +6,20 @@ export type ContractStatus =
   | "accepted"
   | "completed";
 
+export type ContractTemplateId =
+  | "blank"
+  | "instagram"
+  | "tiktok"
+  | "youtube"
+  | "blog";
+
+export type ContractUsageRights =
+  | "organic_only"
+  | "paid_ads"
+  | "full_buyout";
+
 export type ContractData = {
+  contractTemplate: ContractTemplateId;
   clientEmail: string;
   brandName: string;
   platform: string;
@@ -16,7 +29,7 @@ export type ContractData = {
   paymentAmount: string;
   currency: string;
   paymentDeadlineDays: string;
-  usageRights: string;
+  usageRights: ContractUsageRights;
   revisions: string;
   exclusivity: boolean;
   exclusivityDuration: string;

@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { generateContractPdfBuffer } from "@/lib/contract/generateContractPdf";
 import type { ContractData } from "@/app/types/contracts";
+import { normalizeContractData } from "@/lib/contract/schema";
 
 type ContractRow = {
   id: string;
@@ -15,24 +16,6 @@ type ContractRow = {
   status: string;
   contract_data: ContractData;
 };
-
-function normalizeContractData(input: Partial<ContractData>, clientEmail: string): ContractData {
-  return {
-    clientEmail: input.clientEmail || clientEmail,
-    brandName: input.brandName || "",
-    platform: input.platform || "",
-    deliverables: input.deliverables || "",
-    campaignStartDate: input.campaignStartDate || "",
-    campaignEndDate: input.campaignEndDate || "",
-    paymentAmount: input.paymentAmount || "",
-    currency: input.currency || "USD",
-    paymentDeadlineDays: input.paymentDeadlineDays || "30",
-    usageRights: input.usageRights || "organic_only",
-    revisions: input.revisions || "1",
-    exclusivity: Boolean(input.exclusivity),
-    exclusivityDuration: input.exclusivityDuration || "",
-  };
-}
 
 export async function POST(req: Request) {
   try {
