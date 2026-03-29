@@ -2,6 +2,33 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Before starting the app, configure environment variables:
+
+1. Create `.env.local` in the project root.
+2. Add at least these required values:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+You can use `.env.local.example` as a reference for all supported variables.
+
+Optional billing setup with LemonSqueezy:
+
+```bash
+LEMONSQUEEZY_API_KEY=YOUR_LEMONSQUEEZY_API_KEY
+LEMONSQUEEZY_STORE_ID=YOUR_LEMONSQUEEZY_STORE_ID
+LEMONSQUEEZY_VARIANT_ID=YOUR_LEMONSQUEEZY_VARIANT_ID
+LEMONSQUEEZY_WEBHOOK_SECRET=YOUR_LEMONSQUEEZY_WEBHOOK_SECRET
+LEMONSQUEEZY_TEST_MODE=true
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+When these variables are set, the app can create hosted LemonSqueezy checkout links through `POST /api/billing/checkout`.
+
+To sync billing status back into Supabase, configure a LemonSqueezy webhook pointing to `/api/billing/webhook` and run the subscriptions migration in `supabase/migrations/20260329_billing_subscriptions.sql`.
+
 First, run the development server:
 
 ```bash

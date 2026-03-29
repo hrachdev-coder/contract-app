@@ -1,15 +1,19 @@
 export const runtime = "nodejs";
 
+import { createHash } from "crypto";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 import { createServiceClient } from "@/lib/supabase/service";
-import type { ContractData } from "@/app/types/contracts";
+import type { ContractAcceptanceEvidence, ContractData } from "@/app/types/contracts";
 import { normalizeContractData } from "@/lib/contract/schema";
 
 type RespondRouteContext = {
   params: Promise<{ publicToken: string }>;
 };
+
+const ACCEPTANCE_CONSENT_TEXT =
+  "I confirm I have reviewed this agreement and agree to be legally bound by its terms.";
 
 type ContractRow = {
   id: string;
@@ -84,7 +88,7 @@ export async function POST(req: Request, context: RespondRouteContext) {
         );
       }
 
-      // Notify the brand that the influencer has requested changes.
+      // Notify the sender that the client has requested changes.
       if (process.env.RESEND_API_KEY && contract.influencer_email) {
         try {
           const resend = new Resend(process.env.RESEND_API_KEY);
@@ -97,9 +101,9 @@ export async function POST(req: Request, context: RespondRouteContext) {
             subject: `Changes requested on your contract - ${nextData.brandName || "Contract"}`,
             html: `
               <p>Hello,</p>
-              <p>The creator has reviewed your contract and requested changes.</p>
+              <p>The client has reviewed your contract and requested changes.</p>
               ${feedback ? `<p><strong>Their feedback:</strong> ${feedback}</p>` : ""}
-                <p>Review the contract and send an updated version to the creator:</p>
+                <p>Review the contract and send an updated version to the client:</p>
                 <p>
                   <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer">
                     Review &amp; send updated contract
@@ -116,10 +120,73 @@ export async function POST(req: Request, context: RespondRouteContext) {
       return NextResponse.json({ success: true, status: "changes_requested" });
     }
 
+    const hasAcceptedTerms = body?.agreedToTerms === true;
+    if (!hasAcceptedTerms) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "You must accept the legal consent statement before signing.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const signerName = typeof body?.signerName === "string" ? body.signerName.trim() : "";
+    const signerTitle = typeof body?.signerTitle === "string" ? body.signerTitle.trim() : "";
+
+    if (!signerName) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Signer full legal name is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const incomingData = (body?.contractData || {}) as Partial<ContractData>;
+    const acceptedData = normalizeContractData(
+      {
+        ...contract.contract_data,
+        ...incomingData,
+        clientEmail: contract.client_email,
+      },
+      contract.client_email
+    );
+    const acceptedAt = new Date().toISOString();
+    const rawForwardedFor = req.headers.get("x-forwarded-for") || "";
+    const acceptedIp = rawForwardedFor.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
+    const acceptedUserAgent = req.headers.get("user-agent") || null;
+    const contractHash = createHash("sha256")
+      .update(JSON.stringify(acceptedData))
+      .digest("hex");
+    const acceptanceEvidence: ContractAcceptanceEvidence = {
+      signerEmail: contract.client_email,
+      signerName,
+      signerTitle: signerTitle || null,
+      publicToken: contract.public_token,
+      acceptedAt,
+      acceptedIp,
+      acceptedUserAgent,
+      contractHash,
+      consentText: ACCEPTANCE_CONSENT_TEXT,
+      source: "link_review",
+      version: 1,
+    };
+
     const { error: completeError } = await supabase
       .from("contracts")
       .update({
         status: "accepted",
+        contract_data: acceptedData,
+        accepted_at: acceptedAt,
+        accepted_ip: acceptedIp,
+        accepted_user_agent: acceptedUserAgent,
+        accepted_consent: true,
+        accepted_consent_text: ACCEPTANCE_CONSENT_TEXT,
+        contract_hash: contractHash,
+        contract_snapshot: acceptedData,
+        acceptance_evidence: acceptanceEvidence,
       })
       .eq("id", contract.id);
 
@@ -130,7 +197,7 @@ export async function POST(req: Request, context: RespondRouteContext) {
       );
     }
 
-    return NextResponse.json({ success: true, status: "accepted" });
+    return NextResponse.json({ success: true, status: "accepted", contractHash });
   } catch (error) {
     return NextResponse.json(
       {

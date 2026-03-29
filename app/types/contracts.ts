@@ -18,6 +18,20 @@ export type ContractUsageRights =
   | "paid_ads"
   | "full_buyout";
 
+export type ContractAcceptanceEvidence = {
+  signerEmail: string;
+  signerName?: string | null;
+  signerTitle?: string | null;
+  publicToken: string;
+  acceptedAt: string;
+  acceptedIp?: string | null;
+  acceptedUserAgent?: string | null;
+  contractHash: string;
+  consentText: string;
+  source: "link_review";
+  version: number;
+};
+
 export type ContractData = {
   contractTemplate: ContractTemplateId;
   clientEmail: string;

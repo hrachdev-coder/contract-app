@@ -38,7 +38,7 @@ export default async function ContractReviewPage({ params }: ContractPageProps) 
   if (contract.status === "sent" || contract.status === "updated") {
     await supabase
       .from("contracts")
-      .update({ status: "viewed" })
+      .update({ status: "viewed", viewed_at: new Date().toISOString() })
       .eq("id", contract.id);
 
     contract.status = "viewed";
@@ -55,7 +55,7 @@ export default async function ContractReviewPage({ params }: ContractPageProps) 
       initialStatus={contract.status}
       initialFeedback={contract.feedback}
       clientEmail={contract.client_email}
-      influencerEmail={contract.influencer_email}
+      senderEmail={contract.influencer_email}
       createdAt={contract.created_at}
       contractData={safeContractData}
     />

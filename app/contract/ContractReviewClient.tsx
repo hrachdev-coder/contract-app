@@ -4,14 +4,27 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { ContractData } from "@/app/types/contracts";
+import EnglishDatePicker from "@/app/components/EnglishDatePicker";
 import { buildContractSections, formatContractDate } from "@/lib/contract/contractTerms";
+
+const ACCEPTANCE_CONSENT_TEXT =
+  "I confirm I have reviewed this agreement and agree to be legally bound by its terms.";
+
+function deriveSignerName(email: string) {
+  const localPart = email.split("@")[0] || "";
+  return localPart
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
 
 type ContractReviewClientProps = {
   publicToken: string;
   initialStatus: string;
   initialFeedback: string | null;
   clientEmail: string;
-  influencerEmail: string | null;
+  senderEmail: string | null;
   createdAt: string;
   contractData: ContractData;
 };
@@ -36,18 +49,21 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
   const [loadingAction, setLoadingAction] = useState<"request_changes" | "accept" | "send_updated" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [signerName, setSignerName] = useState(() => deriveSignerName(props.clientEmail));
+  const [signerTitle, setSignerTitle] = useState("");
 
   const isFinalized = useMemo(() => status === "accepted" || status === "completed", [status]);
   const canSendUpdatedContract = useMemo(() => status === "changes_requested", [status]);
   const representativeName = useMemo(
-    () => props.influencerEmail || form.brandName || "Brand Representative",
-    [props.influencerEmail, form.brandName]
+    () => props.senderEmail || form.brandName || "Company Representative",
+    [props.senderEmail, form.brandName]
   );
   const contractSections = useMemo(
     () =>
       buildContractSections({
         employerName: representativeName,
-        creatorEmail: props.clientEmail,
+        clientEmail: props.clientEmail,
         contractData: form,
         createdAt: props.createdAt,
       }),
@@ -68,7 +84,25 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
       }));
     };
 
+  const handleDateChange =
+    (key: "campaignStartDate" | "campaignEndDate") => (value: string) => {
+      setForm((current) => ({
+        ...current,
+        [key]: value,
+      }));
+    };
+
   const submitAction = async (action: "request_changes" | "accept") => {
+    if (action === "accept" && !agreedToTerms) {
+      setError("Please confirm the legal consent statement before accepting.");
+      return;
+    }
+
+    if (action === "accept" && !signerName.trim()) {
+      setError("Please enter your full legal name before signing.");
+      return;
+    }
+
     setLoadingAction(action);
     setError(null);
     setSuccess(null);
@@ -83,6 +117,10 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
           action,
           feedback,
           contractData: form,
+          agreedToTerms,
+          consentText: ACCEPTANCE_CONSENT_TEXT,
+          signerName,
+          signerTitle,
         }),
       });
 
@@ -94,10 +132,10 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
 
       if (action === "request_changes") {
         setStatus("changes_requested");
-        setSuccess("Your requested edits were sent back to the brand.");
+        setSuccess("Your requested edits were sent back to the sender.");
       } else {
         setStatus("accepted");
-        setSuccess("Contract accepted. The brand will send the final PDF.");
+        setSuccess("Contract accepted. The sender will send the final PDF.");
       }
 
       router.refresh();
@@ -129,7 +167,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
       }
 
       setStatus("updated");
-      setSuccess("Updated contract sent. The creator has been notified by email.");
+      setSuccess("Updated contract sent. The client has been notified by email.");
       router.refresh();
     } finally {
       setLoadingAction(null);
@@ -163,7 +201,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
               {form.brandName || "Contract"}
             </h1>
             <p style={{ marginTop: "8px", color: "#475569" }}>
-              Review the campaign terms, request edits, or approve the agreement.
+              Review the contract terms, request edits, or approve the agreement.
             </p>
           </div>
           <div
@@ -185,8 +223,8 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
         </div>
 
         <div style={{ marginTop: "18px", display: "grid", gap: "10px" }}>
-          <div><strong>From brand:</strong> {representativeName}</div>
-          <div><strong>For creator:</strong> {props.clientEmail}</div>
+          <div><strong>From sender:</strong> {representativeName}</div>
+          <div><strong>For client:</strong> {props.clientEmail}</div>
           <div><strong>Created:</strong> {formatContractDate(props.createdAt)}</div>
         </div>
 
@@ -199,7 +237,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
             background: "#f8fafc",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "20px" }}>Influencer Campaign Agreement</h2>
+          <h2 style={{ margin: 0, fontSize: "20px" }}>Client Service Agreement</h2>
           <p style={{ marginTop: "8px", color: "#475569", lineHeight: 1.7 }}>
             This contract draft is generated from your selected terms. You can edit the fields below and the agreement text updates automatically.
           </p>
@@ -225,11 +263,11 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
           >
             <div style={{ borderTop: "1px dashed #94a3b8", paddingTop: "8px", color: "#475569" }}>
               <div style={{ fontWeight: 600 }}>{representativeName}</div>
-              <div>Brand Representative</div>
+              <div>Company Representative</div>
             </div>
             <div style={{ borderTop: "1px dashed #94a3b8", paddingTop: "8px", color: "#475569" }}>
               <div style={{ fontWeight: 600 }}>{props.clientEmail}</div>
-              <div>Creator</div>
+              <div>Client</div>
             </div>
           </div>
         </article>
@@ -238,7 +276,7 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
 
         <div style={{ marginTop: "24px", display: "grid", gap: "14px" }}>
           <label style={{ display: "grid", gap: "6px" }}>
-            Brand name
+            Company name
             <input value={form.brandName} onChange={handleFormChange("brandName")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
           </label>
 
@@ -255,11 +293,21 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <label style={{ display: "grid", gap: "6px" }}>
               Campaign start
-              <input type="date" value={form.campaignStartDate} onChange={handleFormChange("campaignStartDate")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <EnglishDatePicker
+                value={form.campaignStartDate}
+                onChange={handleDateChange("campaignStartDate")}
+                disabled={isFinalized}
+                placeholder="Select start date"
+              />
             </label>
             <label style={{ display: "grid", gap: "6px" }}>
               Campaign end
-              <input type="date" value={form.campaignEndDate} onChange={handleFormChange("campaignEndDate")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
+              <EnglishDatePicker
+                value={form.campaignEndDate}
+                onChange={handleDateChange("campaignEndDate")}
+                disabled={isFinalized}
+                placeholder="Select end date"
+              />
             </label>
           </div>
 
@@ -313,6 +361,59 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
               </button>
             ) : (
               <>
+                <div
+                  style={{
+                    width: "100%",
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "12px",
+                  }}
+                >
+                  <label style={{ display: "grid", gap: "6px" }}>
+                    Full legal name
+                    <input
+                      type="text"
+                      value={signerName}
+                      onChange={(event) => setSignerName(event.target.value)}
+                      placeholder="Jane Doe"
+                      style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }}
+                    />
+                  </label>
+                  <label style={{ display: "grid", gap: "6px" }}>
+                    Title / role (optional)
+                    <input
+                      type="text"
+                      value={signerTitle}
+                      onChange={(event) => setSignerTitle(event.target.value)}
+                      placeholder="Founder, Director, Consultant"
+                      style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }}
+                    />
+                  </label>
+                </div>
+
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "10px",
+                    width: "100%",
+                    background: "#f8fafc",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "10px",
+                    padding: "10px 12px",
+                    fontSize: "14px",
+                    color: "#334155",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(event) => setAgreedToTerms(event.target.checked)}
+                    style={{ marginTop: "2px" }}
+                  />
+                  <span>{ACCEPTANCE_CONSENT_TEXT}</span>
+                </label>
+
                 <button
                   type="button"
                   onClick={() => submitAction("request_changes")}

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import "../../auth.css";
+import "../../home.css";
 import HomeHeader from "../../components/HomeHeader";
 
 export default function RegisterPage() {
@@ -126,7 +127,7 @@ export default function RegisterPage() {
           <div className="auth-header">
             <h1 className="auth-title">Create <em>account</em></h1>
             <p className="auth-subtitle">
-              Start managing your influencer contracts today
+              Start managing your client contracts today
             </p>
           </div>
 

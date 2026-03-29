@@ -1,6 +1,7 @@
 import Link from "next/link";
 import "./home.css";
 import HomeHeader from "./components/HomeHeader";
+import LemonSqueezyCheckoutButton from "./components/LemonSqueezyCheckoutButton";
 
 export default function HomePage() {
 
@@ -15,13 +16,13 @@ export default function HomePage() {
         <div>
           <div className="hero-eyebrow">
             <span className="eyebrow-dot" />
-            Trusted by 3,400+ creators
+            Trusted by 3,400+ service businesses
           </div>
           <h1 className="hero-title">
-            Your brand deals,<br /><em>handled</em> with elegance
+            Your client contracts,<br /><em>handled</em> with elegance
           </h1>
           <p className="hero-sub">
-            Generate professional influencer contracts in minutes, send them to brands, and track every signature — from one beautiful dashboard.
+            Generate professional client contracts in minutes, send them for signature, and track every step from one beautiful dashboard.
           </p>
           <div className="hero-actions">
             <a href="/register" className="btn-hero-primary">
@@ -33,6 +34,11 @@ export default function HomePage() {
             <a href="/login" className="btn-hero-secondary">
               Already a member? Log in
             </a>
+            <LemonSqueezyCheckoutButton
+              label="Go Pro"
+              className="btn-ghost"
+              redirectPath="/dashboard"
+            />
           </div>
           <div className="hero-trust">
             <div className="trust-avatars">
@@ -45,7 +51,7 @@ export default function HomePage() {
                 <div key={i} className="trust-avatar" style={{ background: a.bg, color: a.color }}>{a.t}</div>
               ))}
             </div>
-            <p className="trust-text"><strong>3,400+</strong> creators already closing deals faster</p>
+            <p className="trust-text"><strong>3,400+</strong> teams already closing deals faster</p>
           </div>
         </div>
 
@@ -58,7 +64,7 @@ export default function HomePage() {
             </div>
             <div>
               <div className="float-title">Contract Signed ✓</div>
-              <div className="float-sub">Zara × @maya.style — just now</div>
+              <div className="float-sub">Northwind × Bright Studio — just now</div>
             </div>
           </div>
 
@@ -100,7 +106,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div style={{ textAlign:"right" }}>
-                    <div style={{ fontFamily:"'Jost',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)", marginBottom:4 }}>{c.val}</div>
+                    <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)", marginBottom:4 }}>{c.val}</div>
                     <span className={`citem-badge ${c.cls}`}>{c.s}</span>
                   </div>
                 </div>
@@ -114,7 +120,7 @@ export default function HomePage() {
       <div className="stats-row">
         <div className="stats-inner">
           {[
-            { n:"3,400", e:"+",  l:"Active creators"     },
+            { n:"3,400", e:"+",  l:"Active businesses"   },
             { n:"$12",   e:"M+", l:"Contracts generated" },
             { n:"98",    e:"%",  l:"Satisfaction rate"   },
           ].map((s,i) => (
@@ -131,7 +137,7 @@ export default function HomePage() {
         <div className="features-head">
           <div className="section-eyebrow">Features</div>
           <h2 className="section-title">Everything you need to<br /><em>close deals effortlessly</em></h2>
-          <p className="section-sub">Built for influencers who take their business seriously — without the complexity.</p>
+          <p className="section-sub">Built for freelancers, agencies, and consultants who want to run contracts without the complexity.</p>
         </div>
         <div className="features-grid">
           {[
@@ -143,7 +149,7 @@ export default function HomePage() {
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M4 6h18v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="#d4826e" strokeWidth="1.6"/><path d="M9 6V4M17 6V4M4 11h18" stroke="#d4826e" strokeWidth="1.6" strokeLinecap="round"/><path d="M9 16l2 2 4-4" stroke="#d4826e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
               title: "E-Signature & Invitations",
-              desc: "Send contracts directly to brands via email. They review and e-sign in one click — no account needed on their end.",
+              desc: "Send contracts directly to clients via email. They review and e-sign in one click, with no account required.",
             },
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="9" stroke="#d4826e" strokeWidth="1.6"/><path d="M13 8v5.5l3.5 3.5" stroke="#d4826e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
@@ -157,13 +163,13 @@ export default function HomePage() {
             },
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="3" width="9" height="9" rx="2" stroke="#d4826e" strokeWidth="1.6"/><rect x="14" y="3" width="9" height="9" rx="2" stroke="#d4826e" strokeWidth="1.6"/><rect x="3" y="14" width="9" height="9" rx="2" stroke="#d4826e" strokeWidth="1.6"/><circle cx="18.5" cy="18.5" r="4.5" fill="#fce8e4" stroke="#d4826e" strokeWidth="1.4"/><path d="M17 18.5h3M18.5 17v3" stroke="#d4826e" strokeWidth="1.3" strokeLinecap="round"/></svg>,
-              title: "Campaign Dashboard",
-              desc: "All your campaigns, payment statuses, and deadlines in one elegant view — no spreadsheets required.",
+              title: "Contract Dashboard",
+              desc: "All your contracts, payment statuses, and deadlines in one elegant view — no spreadsheets required.",
             },
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 3l2.8 6 6.2.9-4.5 4.4 1 6.2-5.5-2.8-5.5 2.8 1-6.2-4.5-4.4 6.2-.9L13 3z" stroke="#d4826e" strokeWidth="1.6" strokeLinejoin="round" fill="#fce8e4"/></svg>,
               title: "Ready-Made Templates",
-              desc: "Start from our library: sponsored posts, ambassador deals, usage licensing, gifting campaigns — crafted by legal experts.",
+              desc: "Start from our library: service agreements, project scopes, retainers, and licensing terms — crafted by legal experts.",
             },
           ].map((f) => (
             <div key={f.title} className="feat-card">
@@ -184,10 +190,10 @@ export default function HomePage() {
             <p className="section-sub">No legal background needed. No confusing tools. Just a beautiful, guided flow.</p>
             <div style={{ marginTop: 48 }}>
               {[
-                { n:"01", t:"Fill in campaign details", d:"Enter brand info, deliverables, compensation, usage rights and exclusivity. Our builder guides every clause." },
+                { n:"01", t:"Fill in contract details", d:"Enter client info, deliverables, compensation, usage rights and exclusivity. Our builder guides every clause." },
                 { n:"02", t:"Generate your contract",   d:"Contrakt produces a polished PDF contract with your details and full legal protections built in." },
-                { n:"03", t:"Send & get signed",        d:"Email the contract link to your brand contact. They review, request changes if needed, and e-sign instantly." },
-                { n:"04", t:"Manage & get paid",        d:"Track milestones and payment deadlines from your dashboard. Stay on top of every campaign, effortlessly." },
+                { n:"03", t:"Send & get signed",        d:"Email the contract link to your client contact. They review, request changes if needed, and e-sign instantly." },
+                { n:"04", t:"Manage & get paid",        d:"Track milestones and payment deadlines from your dashboard. Stay on top of every contract, effortlessly." },
               ].map((s) => (
                 <div key={s.n} className="step-row">
                   <div className="step-num">{s.n}</div>
@@ -210,8 +216,8 @@ export default function HomePage() {
                 New Contract
               </div>
               {[
-                { label:"Brand Name",    val:"Zara International", filled:true  },
-                { label:"Campaign Type", val:"Sponsored Post",      filled:true  },
+                { label:"Client Name",   val:"Northwind Studio",    filled:true  },
+                { label:"Project Type",  val:"Monthly Retainer",    filled:true  },
               ].map((f) => (
                 <div key={f.label} className="mock-field">
                   <span className="mock-label">{f.label}</span>
@@ -248,8 +254,8 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontFamily:"'Jost',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)" }}>Contract sent to brand@zara.com</div>
-                <div style={{ fontFamily:"'Jost',sans-serif", fontSize:12, color:"var(--muted)", marginTop:2 }}>Awaiting e-signature · expires in 7 days</div>
+                <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)" }}>Contract sent to ops@northwind.com</div>
+                <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:12, color:"var(--muted)", marginTop:2 }}>Awaiting e-signature · expires in 7 days</div>
               </div>
             </div>
           </div>
@@ -260,14 +266,14 @@ export default function HomePage() {
       <section id="reviews" className="testi-section">
         <div className="testi-head">
           <div className="section-eyebrow">Testimonials</div>
-          <h2 className="section-title">Creators who <em>love</em> Contrakt</h2>
-          <p className="section-sub">Real stories from influencers who transformed how they manage brand deals.</p>
+          <h2 className="section-title">Teams who <em>love</em> Contrakt</h2>
+          <p className="section-sub">Real stories from service businesses that transformed how they manage client contracts.</p>
         </div>
         <div className="testi-grid">
           {[
-            { q:"Before Contrakt, I was sending Word docs back and forth for weeks. Now I close campaigns in an afternoon. It completely changed how I run my business.", name:"Sofia Martinez", handle:"@sofia.creates · 420K", bg:"#fde8e4", fg:"#a04030", i:"SM" },
-            { q:"I've had brands ghost me after agreeing to terms. Now everything is signed before I lift a finger. The peace of mind alone is worth it.", name:"James Park", handle:"@parklife.james · 185K", bg:"#e8eaf6", fg:"#3949ab", i:"JP" },
-            { q:"The templates are incredible. I used to pay $300 per contract. Now I handle everything in 5 minutes and it looks way more professional.", name:"Anika Osei", handle:"@anika.lifestyle · 870K", bg:"#e8f5e9", fg:"#2e7d32", i:"AO" },
+            { q:"Before Contrakt, I was sending Word docs back and forth for weeks. Now we close projects in an afternoon. It completely changed how we run our studio.", name:"Sofia Martinez", handle:"Creative Studio Owner", bg:"#fde8e4", fg:"#a04030", i:"SM" },
+            { q:"Clients used to go silent after agreeing to terms. Now everything is signed before kickoff. The peace of mind alone is worth it.", name:"James Park", handle:"Growth Consultant", bg:"#e8eaf6", fg:"#3949ab", i:"JP" },
+            { q:"The templates are incredible. I used to pay $300 per contract. Now I handle everything in 5 minutes and it looks way more professional.", name:"Anika Osei", handle:"Agency Founder", bg:"#e8f5e9", fg:"#2e7d32", i:"AO" },
           ].map((t) => (
             <div key={t.name} className="testi-card">
               <div className="testi-stars">
@@ -295,8 +301,8 @@ export default function HomePage() {
         <div className="cta-box">
           <div className="cta-deco cta-deco-1" />
           <div className="cta-deco cta-deco-2" />
-          <h2 className="cta-title">Ready to work like a<br /><em>professional creator?</em></h2>
-          <p className="cta-sub">Join 3,400+ influencers who close deals faster and always get paid on time.</p>
+          <h2 className="cta-title">Ready to run contracts like a<br /><em>professional team?</em></h2>
+          <p className="cta-sub">Join 3,400+ freelancers and agencies who close deals faster and get paid on time.</p>
           <div className="cta-actions">
             <a href="/register" className="btn-cta-primary">
               Create your first contract
@@ -305,6 +311,11 @@ export default function HomePage() {
               </svg>
             </a>
             <a href="/login" className="btn-cta-ghost">Log in to my account</a>
+            <LemonSqueezyCheckoutButton
+              label="Upgrade with LemonSqueezy"
+              className="btn-cta-ghost"
+              redirectPath="/dashboard"
+            />
           </div>
           <p className="cta-note">Free to start · No credit card required · Cancel anytime</p>
         </div>

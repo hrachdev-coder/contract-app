@@ -31,15 +31,15 @@ export function labelUsageRights(rawValue: string) {
 
 export function buildContractSections(args: {
   employerName: string;
-  creatorEmail: string;
+  clientEmail: string;
   contractData: ContractData;
   createdAt?: string;
 }): ContractSection[] {
-  const { employerName, creatorEmail, contractData, createdAt } = args;
+  const { employerName, clientEmail, contractData, createdAt } = args;
 
-  const brandName = fallback(contractData.brandName, "Brand");
-  const employer = fallback(employerName, "Brand Representative");
-  const creator = fallback(creatorEmail, "Creator");
+  const companyName = fallback(contractData.brandName, "Company");
+  const employer = fallback(employerName, "Company Representative");
+  const client = fallback(clientEmail, "Client");
   const template = getContractTemplateById(contractData.contractTemplate);
   const platform = fallback(contractData.platform, "Not specified");
   const deliverables = fallback(contractData.deliverables, "Not specified");
@@ -52,36 +52,36 @@ export function buildContractSections(args: {
   const usageRights = labelUsageRights(contractData.usageRights);
   const revisions = fallback(contractData.revisions, "0");
   const exclusivityText = contractData.exclusivity
-    ? `Creator agrees not to promote direct competitors for ${fallback(
+    ? `Client agrees not to work with direct competitors for ${fallback(
         contractData.exclusivityDuration,
-        "the campaign period"
+        "the project period"
       )}.`
     : "No exclusivity obligations apply unless otherwise agreed in writing.";
 
   return [
     {
       title: "1. Parties",
-      body: `This Influencer Campaign Agreement (the \"Agreement\") is entered into on ${effectiveDate} between ${brandName} (represented by ${employer}) and the Creator (${creator}). This agreement is based on the ${template.name} campaign template selected by the Brand.`,
+      body: `This Client Service Agreement (the \"Agreement\") is entered into on ${effectiveDate} between ${companyName} (represented by ${employer}) and the Client (${client}). This agreement is based on the ${template.name} template selected by the Company.`,
     },
     {
       title: "2. Scope of Work",
-      body: `Creator will produce and publish campaign content on ${platform}. Deliverables include: ${deliverables}. Creator shall perform the services professionally and in accordance with the campaign brief provided by the Brand.`,
+      body: `Client-facing deliverables will be produced and delivered on ${platform}. Deliverables include: ${deliverables}. Services will be performed professionally and in accordance with the project brief provided by the Company.`,
     },
     {
-      title: "3. Campaign Timeline",
-      body: `The campaign period starts on ${campaignStart} and ends on ${campaignEnd}. All deliverables must be submitted and/or published within this period unless both parties approve a revised schedule in writing.`,
+      title: "3. Project Timeline",
+      body: `The project period starts on ${campaignStart} and ends on ${campaignEnd}. All deliverables must be submitted within this period unless both parties approve a revised schedule in writing.`,
     },
     {
       title: "4. Compensation",
-      body: `Brand will pay Creator ${paymentAmount} ${paymentCurrency}. Payment is due within ${paymentDeadlineDays} days from receipt of valid invoice and completion of deliverables (unless otherwise agreed in writing).`,
+      body: `Company will pay Client ${paymentAmount} ${paymentCurrency}. Payment is due within ${paymentDeadlineDays} days from receipt of valid invoice and completion of deliverables (unless otherwise agreed in writing).`,
     },
     {
       title: "5. Content Usage Rights",
-      body: `Usage rights granted to Brand: ${usageRights}. Any use outside this scope requires Creator's prior written approval.`,
+      body: `Usage rights granted to Company: ${usageRights}. Any use outside this scope requires Client's prior written approval.`,
     },
     {
       title: "6. Revisions",
-      body: `Creator includes ${revisions} revision round(s) in the agreed fee. Additional revisions may be billed separately upon mutual agreement.`,
+      body: `Client includes ${revisions} revision round(s) in the agreed fee. Additional revisions may be billed separately upon mutual agreement.`,
     },
     {
       title: "7. Exclusivity",
@@ -89,7 +89,7 @@ export function buildContractSections(args: {
     },
     {
       title: "8. Confidentiality",
-      body: "Both parties agree to keep confidential any non-public business, campaign, pricing, or strategic information received during this engagement.",
+      body: "Both parties agree to keep confidential any non-public business, project, pricing, or strategic information received during this engagement.",
     },
     {
       title: "9. Termination",

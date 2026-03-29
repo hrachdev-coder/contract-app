@@ -73,7 +73,7 @@ export async function POST(req: Request, context: ResendRouteContext) {
     const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
     const baseUrl = new URL(req.url).origin;
     const reviewUrl = `${baseUrl}/contract/${contract.public_token}`;
-    const employerName = contract.influencer_email || "Your brand contact";
+    const employerName = contract.influencer_email || "Your contract contact";
 
     const emailSendResult = await resend.emails.send({
       from: fromEmail,
@@ -97,7 +97,7 @@ export async function POST(req: Request, context: ResendRouteContext) {
       return NextResponse.json(
         {
           success: false,
-          message: emailSendResult.error.message || "Failed to send creator notification",
+          message: emailSendResult.error.message || "Failed to send client notification",
         },
         { status: 502 }
       );

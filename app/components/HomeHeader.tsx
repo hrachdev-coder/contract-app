@@ -46,9 +46,9 @@ export default function HomeHeader() {
           <span className="logo-text">Contrakt</span>
         </Link>
         <div className="nav-links">
-          <a href="#features"     className="nav-link">Features</a>
-          <a href="#how-it-works" className="nav-link">How it works</a>
-          <a href="#reviews"      className="nav-link">Reviews</a>
+          <Link href="/#features" className="nav-link">Features</Link>
+          <Link href="/#how-it-works" className="nav-link">How it works</Link>
+          <Link href="/#reviews" className="nav-link">Reviews</Link>
           <div className="nav-divider" />
           {user ? (
             <>

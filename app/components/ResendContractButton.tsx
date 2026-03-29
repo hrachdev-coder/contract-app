@@ -43,10 +43,10 @@ export default function ResendContractButton({
         disabled={loading || sent}
         className="btn-resend disabled:opacity-50"
       >
-        {loading ? "Sending..." : sent ? "Sent ✓" : "Resend to creator"}
+        {loading ? "Sending..." : sent ? "Sent ✓" : "Resend to client"}
       </button>
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
-      {sent ? <p className="text-xs text-green-600">Creator notified by email.</p> : null}
+      {sent ? <p className="text-xs text-green-600">Client notified by email.</p> : null}
     </div>
   );
 }

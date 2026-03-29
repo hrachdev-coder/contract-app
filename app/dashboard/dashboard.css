@@ -3,7 +3,7 @@
 .dashboard-container {
   min-height: 100vh;
   background: var(--background);
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
 }
 
 .dashboard-header {
@@ -13,7 +13,7 @@
 }
 
 .dashboard-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: clamp(42px, 5vw, 64px);
   font-weight: 300;
   color: var(--text-primary);
@@ -22,7 +22,7 @@
 }
 
 .dashboard-subtitle {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 16px;
   font-weight: 300;
   color: var(--text-secondary);
@@ -86,7 +86,7 @@
 }
 
 .stat-value {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: 48px;
   font-weight: 300;
   color: var(--text-primary);
@@ -100,7 +100,7 @@
 }
 
 .stat-label {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
@@ -148,14 +148,14 @@
 }
 
 .section-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: 32px;
   font-weight: 300;
   color: var(--text-primary);
 }
 
 .btn-primary {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -199,7 +199,7 @@
 }
 
 .empty-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: 28px;
   font-weight: 300;
   color: var(--text-primary);
@@ -207,7 +207,7 @@
 }
 
 .empty-subtitle {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 16px;
   font-weight: 300;
   color: var(--text-secondary);
@@ -262,7 +262,7 @@
 }
 
 .contract-brand {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: 24px;
   font-weight: 600;
   color: var(--text-primary);
@@ -270,7 +270,7 @@
 }
 
 .contract-email {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
@@ -278,7 +278,7 @@
 }
 
 .contract-date {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 300;
   color: var(--text-muted);
@@ -291,7 +291,7 @@
 }
 
 .status-badge {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -340,7 +340,7 @@
 }
 
 .btn-secondary {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -363,7 +363,7 @@
 }
 
 .btn-resend {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -386,7 +386,7 @@
 }
 
 .btn-delete {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.04em;

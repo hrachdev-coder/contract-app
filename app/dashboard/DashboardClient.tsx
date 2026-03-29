@@ -8,6 +8,7 @@ import type { User } from "@supabase/supabase-js";
 import ResendContractButton from "../components/ResendContractButton";
 import FinalizeContractButton from "../components/FinalizeContractButton";
 import DeleteContractButton from "../components/DeleteContractButton";
+import LemonSqueezyCheckoutButton from "../components/LemonSqueezyCheckoutButton";
 import LogoutButton from "../components/LogoutButton";
 import type { ContractData, ContractStatus } from "@/app/types/contracts";
 import { getContractTemplateById } from "@/lib/contract/templates";
@@ -21,6 +22,20 @@ type Contract = {
   status: string;
   created_at: string;
   public_token: string | null;
+};
+
+type BillingState = {
+  configured: boolean;
+  hasActiveAccess: boolean;
+  subscription: {
+    status: string | null;
+    status_formatted: string | null;
+    plan_name: string | null;
+    renews_at: string | null;
+    ends_at: string | null;
+    customer_portal_url: string | null;
+    update_payment_method_url: string | null;
+  } | null;
 };
 
 declare global {
@@ -47,6 +62,7 @@ export default function DashboardClient() {
   const [user, setUser] = useState<User | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
+  const [billing, setBilling] = useState<BillingState | null>(null);
 
   const statusMeta: Record<
     ContractStatus,
@@ -77,6 +93,24 @@ export default function DashboardClient() {
     setLoading(false);
   };
 
+  const fetchBilling = async () => {
+    try {
+      const response = await fetch("/api/billing/subscription", {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const payload = (await response.json()) as BillingState;
+      setBilling(payload);
+    } catch {
+      // Non-critical billing panel.
+    }
+  };
+
   const handleDeleteSuccess = (contractId: string) => {
     setContracts((currentContracts) =>
       currentContracts.filter((contract) => contract.id !== contractId)
@@ -104,6 +138,7 @@ export default function DashboardClient() {
       }
       userIdRef.current = user.id;
       setUser(user);
+      void fetchBilling();
       await fetchContracts(user.id);
     };
 
@@ -120,6 +155,7 @@ export default function DashboardClient() {
       userIdRef.current = nextUser?.id ?? null;
       setUser(nextUser);
       if (nextUser?.id) {
+        void fetchBilling();
         void fetchContracts(nextUser.id);
       } else {
         setContracts([]);
@@ -176,7 +212,61 @@ export default function DashboardClient() {
       <div className="dashboard-container">
         <div className="dashboard-header">
           <h1 className="dashboard-title">Welcome back,<br /><em>{user?.email?.split('@')[0]}</em></h1>
-          <p className="dashboard-subtitle">Manage creator contracts and track every review from one dashboard.</p>
+          <p className="dashboard-subtitle">Manage client contracts and track every review from one dashboard.</p>
+          {billing?.configured ? (
+            <div
+              style={{
+                marginTop: "20px",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "12px",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  background: billing.hasActiveAccess ? "#dcfce7" : "#fef3c7",
+                  color: billing.hasActiveAccess ? "#166534" : "#92400e",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                {billing.hasActiveAccess
+                  ? billing.subscription?.plan_name || billing.subscription?.status_formatted || "Active plan"
+                  : "Billing inactive"}
+              </span>
+              {billing.subscription?.renews_at ? (
+                <span style={{ color: "var(--text-secondary)", fontSize: "13px" }}>
+                  Renews {new Date(billing.subscription.renews_at).toLocaleDateString("en-US")}
+                </span>
+              ) : null}
+              {billing.subscription?.customer_portal_url ? (
+                <a
+                  href={billing.subscription.customer_portal_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-ghost"
+                >
+                  Manage Billing
+                </a>
+              ) : null}
+            </div>
+          ) : null}
+          <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+            <LemonSqueezyCheckoutButton
+              label={billing?.hasActiveAccess ? "Change Plan" : "Upgrade Your Workspace"}
+              className="btn-primary"
+              email={user?.email || null}
+              name={user?.email?.split("@")[0] || null}
+              userId={user?.id || null}
+              redirectPath="/dashboard"
+            />
+          </div>
           
           <div className="stats-grid">
             <div className="stat-card">
@@ -229,7 +319,7 @@ export default function DashboardClient() {
 
         <div className="contracts-section">
           <div className="section-header">
-            <h2 className="section-title">Creator Contracts</h2>
+            <h2 className="section-title">Client Contracts</h2>
             <Link href="/dashboard/new" className="btn-primary">
               + New Contract
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -247,7 +337,7 @@ export default function DashboardClient() {
                 </svg>
               </div>
               <h3 className="empty-title">No contracts yet</h3>
-              <p className="empty-subtitle">Create your first creator contract and send it out for review</p>
+              <p className="empty-subtitle">Create your first client contract and send it out for review</p>
               <Link href="/dashboard/new" className="btn-primary">
                 Create Your First Contract
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

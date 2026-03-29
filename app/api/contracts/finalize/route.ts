@@ -5,7 +5,7 @@ import { Resend } from "resend";
 
 import { createClient } from "@/lib/supabase/server";
 import { generateContractPdfBuffer } from "@/lib/contract/generateContractPdf";
-import type { ContractData } from "@/app/types/contracts";
+import type { ContractAcceptanceEvidence, ContractData } from "@/app/types/contracts";
 import { normalizeContractData } from "@/lib/contract/schema";
 
 type ContractRow = {
@@ -15,6 +15,7 @@ type ContractRow = {
   influencer_email: string | null;
   status: string;
   contract_data: ContractData;
+  acceptance_evidence: ContractAcceptanceEvidence | null;
 };
 
 export async function POST(req: Request) {
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
 
     const { data: contract, error: contractError } = await supabase
       .from("contracts")
-      .select("id, influencer_id, client_email, influencer_email, status, contract_data")
+      .select("id, influencer_id, client_email, influencer_email, status, contract_data, acceptance_evidence")
       .eq("id", contractId)
       .eq("influencer_id", user.id)
       .single<ContractRow>();
@@ -70,11 +71,12 @@ export async function POST(req: Request) {
     }
 
     const contractData = normalizeContractData(contract.contract_data || {}, contract.client_email);
-    const employerName = contract.influencer_email || "Influencer";
+    const employerName = contract.influencer_email || "Sender";
 
     const pdfBuffer = await generateContractPdfBuffer({
       employerName,
       contractData,
+      acceptanceEvidence: contract.acceptance_evidence,
     });
 
     const resend = new Resend(process.env.RESEND_API_KEY);

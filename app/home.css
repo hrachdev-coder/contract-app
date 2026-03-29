@@ -35,19 +35,19 @@
   display: flex; align-items: center; justify-content: center;
 }
 .logo-text {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: 22px; font-weight: 600; color: var(--text-primary); letter-spacing: 0.02em;
 }
 .nav-links { display: flex; align-items: center; gap: 36px; }
 .nav-link {
-  font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 400;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 400;
   letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--text-secondary); text-decoration: none; transition: color 0.2s;
 }
 .nav-link:hover { color: var(--text-primary); }
 .nav-divider { width: 1px; height: 20px; background: var(--border); }
 .btn-ghost {
-  font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 500;
   letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--text-primary); background: none;
   border: 1.5px solid var(--border); border-radius: 100px; padding: 9px 22px;
@@ -56,7 +56,7 @@
 }
 .btn-ghost:hover { background: var(--background); border-color: var(--primary); }
 .btn-filled {
-  font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--surface);
   background: var(--gradient);
@@ -75,7 +75,7 @@
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
-  padding: 6px 16px; font-family: 'Jost', sans-serif;
+  padding: 6px 16px; font-family: 'Manrope', sans-serif;
   font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--primary); margin-bottom: 28px;
 }
@@ -85,7 +85,7 @@
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 .hero-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: clamp(52px, 5.5vw, 80px); font-weight: 300;
   color: var(--text-primary); line-height: 1.08; letter-spacing: -0.01em; margin-bottom: 28px;
 }
@@ -97,12 +97,12 @@
   -webkit-text-fill-color: transparent;
 }
 .hero-sub {
-  font-family: 'Jost', sans-serif; font-size: 16px; font-weight: 300;
+  font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 300;
   line-height: 1.75; color: var(--text-secondary); max-width: 420px; margin-bottom: 44px;
 }
 .hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .btn-hero-primary {
-  font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--surface);
   background: var(--gradient);
   border: none; border-radius: 100px; padding: 16px 36px;
@@ -112,7 +112,7 @@
 }
 .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(59, 130, 246, 0.5); }
 .btn-hero-secondary {
-  font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 400;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 400;
   color: var(--text-secondary); background: none;
   display: flex; align-items: center; gap: 8px; transition: color 0.2s;
   text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border);
@@ -124,11 +124,11 @@
   width: 32px; height: 32px; border-radius: 50%;
   border: 2px solid var(--surface);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 600;
   margin-left: -8px;
 }
 .trust-avatar:first-child { margin-left: 0; }
-.trust-text { font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; color: var(--text-secondary); }
+.trust-text { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 300; color: var(--text-secondary); }
 .trust-text strong { font-weight: 600; color: var(--text-primary); }
 
 /* hero visual */
@@ -141,15 +141,15 @@
 .card-chip {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--background); border-radius: 100px; padding: 6px 14px;
-  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 500;
+  font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 500;
   letter-spacing: 0.05em; color: var(--primary); margin-bottom: 20px;
 }
 .amount-display {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: 48px; font-weight: 300; color: var(--text-primary); line-height: 1; margin-bottom: 6px;
 }
 .amount-label {
-  font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400;
+  font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 400;
   color: var(--text-secondary); letter-spacing: 0.04em; margin-bottom: 28px;
 }
 .progress-bar-wrap {
@@ -162,7 +162,7 @@
 }
 .progress-meta {
   display: flex; justify-content: space-between;
-  font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-secondary); margin-bottom: 28px;
+  font-family: 'Manrope', sans-serif; font-size: 11px; color: var(--text-secondary); margin-bottom: 28px;
 }
 .contract-items { display: flex; flex-direction: column; gap: 12px; }
 .citem {
@@ -171,10 +171,10 @@
 }
 .citem-left { display: flex; align-items: center; gap: 12px; }
 .citem-dot { width: 8px; height: 8px; border-radius: 50%; }
-.citem-name { font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-primary); }
-.citem-sub { font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.citem-name { font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.citem-sub { font-family: 'Manrope', sans-serif; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 .citem-badge {
-  font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 10px; font-weight: 600;
   letter-spacing: 0.05em; border-radius: 100px; padding: 4px 10px; text-transform: uppercase;
 }
 .badge-signed  { background: #dcfce7; color: #166534; }
@@ -195,8 +195,8 @@
   width: 36px; height: 36px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
 }
-.float-title { font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-primary); }
-.float-sub   { font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+.float-title { font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.float-sub   { font-family: 'Manrope', sans-serif; font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
 
 /* ── STATS ── */
 .stats-row { max-width: 1180px; margin: 0 auto 80px; padding: 0 36px; }
@@ -209,25 +209,25 @@
   border-right: 1px solid var(--border);
 }
 .stat-cell:last-child { border-right: none; }
-.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--text-primary); line-height: 1; }
+.stat-num { font-family: 'Sora', serif; font-size: 52px; font-weight: 300; color: var(--text-primary); line-height: 1; }
 .stat-num em { font-style: italic; color: var(--primary); }
 .stat-lbl {
-  font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400;
+  font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 400;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); margin-top: 8px;
 }
 
 /* ── SECTIONS ── */
 .section-eyebrow {
-  font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 500;
+  font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 500;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary); margin-bottom: 14px;
 }
 .section-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Sora', serif;
   font-size: clamp(34px, 4vw, 52px); font-weight: 300; color: var(--text-primary); line-height: 1.15;
 }
 .section-title em { font-style: italic; font-weight: 600; color: var(--primary); }
 .section-sub {
-  font-family: 'Jost', sans-serif; font-size: 15px; font-weight: 300;
+  font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 300;
   line-height: 1.75; color: var(--text-secondary); margin-top: 16px; max-width: 480px;
 }
 
@@ -252,8 +252,8 @@
   background: var(--background);
   display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
 }
-.feat-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
-.feat-desc { font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text-secondary); }
+.feat-title { font-family: 'Sora', serif; font-size: 22px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+.feat-desc { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text-secondary); }
 
 /* ── HOW IT WORKS ── */
 .how-section {
@@ -271,26 +271,26 @@
 }
 .step-row:last-child { border-bottom: none; }
 .step-num {
-  font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300;
+  font-family: 'Sora', serif; font-size: 42px; font-weight: 300;
   color: var(--primary); line-height: 1; flex-shrink: 0; width: 48px;
 }
-.step-body-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
-.step-body-desc { font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text-secondary); }
+.step-body-title { font-family: 'Sora', serif; font-size: 22px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+.step-body-desc { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text-secondary); }
 
 .mock-form { background: var(--background); border: 1px solid var(--border); border-radius: 28px; padding: 32px; }
 .mock-form-title {
-  font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--text-primary);
+  font-family: 'Sora', serif; font-size: 20px; font-weight: 600; color: var(--text-primary);
   margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
 }
 .mock-field { margin-bottom: 14px; }
 .mock-label {
-  font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 500;
+  font-family: 'Manrope', sans-serif; font-size: 10px; font-weight: 500;
   letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 6px; display: block;
 }
 .mock-input {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 12px; padding: 12px 16px;
-  font-family: 'Jost', sans-serif; font-size: 14px; color: var(--text-primary); width: 100%;
+  font-family: 'Manrope', sans-serif; font-size: 14px; color: var(--text-primary); width: 100%;
 }
 .mock-input.placeholder { color: var(--text-muted); font-style: italic; }
 .mock-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -298,7 +298,7 @@
   width: 100%; margin-top: 20px;
   background: var(--gradient);
   color: var(--surface); border: none; border-radius: 14px; padding: 14px;
-  font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
 }
@@ -314,17 +314,17 @@
 }
 .testi-stars { display: flex; gap: 3px; margin-bottom: 20px; }
 .testi-quote {
-  font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 300; font-style: italic;
+  font-family: 'Sora', serif; font-size: 18px; font-weight: 300; font-style: italic;
   color: var(--text-primary); line-height: 1.65; margin-bottom: 26px;
 }
 .testi-author { display: flex; align-items: center; gap: 12px; }
 .testi-av {
   width: 44px; height: 44px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 600; flex-shrink: 0;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600; flex-shrink: 0;
 }
-.testi-name { font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-primary); }
-.testi-handle { font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; color: var(--text-secondary); margin-top: 2px; }
+.testi-name { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.testi-handle { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 300; color: var(--text-secondary); margin-top: 2px; }
 
 /* ── CTA ── */
 .cta-wrap { padding: 0 36px 100px; max-width: 1180px; margin: 0 auto; }
@@ -339,17 +339,17 @@
 .cta-deco-1 { width: 500px; height: 500px; top: -150px; left: -100px; }
 .cta-deco-2 { width: 400px; height: 400px; bottom: -100px; right: -80px; }
 .cta-title {
-  font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 4.5vw, 60px);
+  font-family: 'Sora', serif; font-size: clamp(36px, 4.5vw, 60px);
   font-weight: 300; color: #f8fafc; line-height: 1.1; position: relative; z-index: 1; margin-bottom: 18px;
 }
 .cta-title em { font-style: italic; font-weight: 600; color: #3b82f6; }
 .cta-sub {
-  font-family: 'Jost', sans-serif; font-size: 16px; font-weight: 300;
+  font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 300;
   color: rgba(248, 250, 252, 0.6); margin-bottom: 44px; position: relative; z-index: 1;
 }
 .cta-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; position: relative; z-index: 1; }
 .btn-cta-primary {
-  font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-primary);
   background: #3b82f6;
   border: none; border-radius: 100px; padding: 16px 38px; cursor: pointer; transition: all 0.25s;
@@ -358,7 +358,7 @@
 }
 .btn-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(59, 130, 246, 0.6); }
 .btn-cta-ghost {
-  font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 400;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 400;
   color: rgba(248, 250, 252, 0.7); background: transparent;
   border: 1.5px solid rgba(248, 250, 252, 0.25); border-radius: 100px; padding: 16px 32px;
   cursor: pointer; transition: all 0.2s; text-decoration: none;
@@ -366,7 +366,7 @@
 }
 .btn-cta-ghost:hover { border-color: rgba(248, 250, 252, 0.6); color: #f8fafc; }
 .cta-note {
-  font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300;
+  font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 300;
   color: rgba(248, 250, 252, 0.4); margin-top: 28px; position: relative; z-index: 1;
 }
 
@@ -378,12 +378,12 @@
 }
 .footer-links { display: flex; gap: 28px; }
 .footer-link {
-  font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400;
+  font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 400;
   letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary);
   text-decoration: none; transition: color 0.2s;
 }
 .footer-link:hover { color: var(--primary); }
-.footer-copy { font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; color: var(--text-secondary); }
+.footer-copy { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 300; color: var(--text-secondary); }
 
 /* ── MODAL ── */
 .modal-backdrop {
@@ -413,23 +413,23 @@
 }
 .modal-tab {
   flex: 1; text-align: center;
-  font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 500;
   letter-spacing: 0.04em; text-transform: uppercase;
   padding: 10px; border-radius: 11px; cursor: pointer; border: none;
   background: none; color: var(--text-secondary); transition: all 0.2s;
 }
 .modal-tab.active { background: var(--surface); color: var(--text-primary); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1); }
-.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
-.modal-sub { font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 300; color: var(--text-secondary); margin-bottom: 28px; }
+.modal-title { font-family: 'Sora', serif; font-size: 28px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.modal-sub { font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 300; color: var(--text-secondary); margin-bottom: 28px; }
 .field { margin-bottom: 16px; }
 .field label {
-  display: block; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 500;
+  display: block; font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 500;
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 7px;
 }
 .field input {
   width: 100%; background: var(--background);
   border: 1.5px solid var(--border); border-radius: 14px; padding: 13px 16px;
-  font-family: 'Jost', sans-serif; font-size: 14px; color: var(--text-primary);
+  font-family: 'Manrope', sans-serif; font-size: 14px; color: var(--text-primary);
   outline: none; transition: border-color 0.2s;
 }
 .field input:focus { border-color: var(--primary); }
@@ -438,7 +438,7 @@
   width: 100%; margin-top: 8px;
   background: var(--gradient);
   color: var(--surface); border: none; border-radius: 14px; padding: 15px;
-  font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600;
   letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.38); transition: all 0.2s;
 }
@@ -447,7 +447,7 @@
   display: flex; align-items: center; gap: 12px; margin: 22px 0;
 }
 .modal-divider span {
-  font-family: 'Jost', sans-serif; font-size: 11px; color: var(--text-secondary);
+  font-family: 'Manrope', sans-serif; font-size: 11px; color: var(--text-secondary);
   white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase;
 }
 .modal-divider::before, .modal-divider::after {
@@ -456,18 +456,18 @@
 .social-btn {
   width: 100%; background: var(--background);
   border: 1.5px solid var(--border); border-radius: 14px; padding: 12px;
-  font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-primary);
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-primary);
   cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
   transition: all 0.2s; margin-bottom: 10px;
 }
 .social-btn:hover { border-color: var(--text-secondary); background: var(--border-light); }
 .modal-switch {
   text-align: center; margin-top: 20px;
-  font-family: 'Jost', sans-serif; font-size: 13px; color: var(--text-secondary);
+  font-family: 'Manrope', sans-serif; font-size: 13px; color: var(--text-secondary);
 }
 .modal-switch button {
   background: none; border: none; cursor: pointer; color: var(--primary);
-  font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 600;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600;
   text-decoration: underline; text-underline-offset: 3px;
 }
 

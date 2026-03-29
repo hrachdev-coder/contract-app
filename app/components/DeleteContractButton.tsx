@@ -56,7 +56,7 @@ export default function DeleteContractButton({
         disabled={loading}
         className="btn-delete"
         style={{
-          fontFamily: "Jost, sans-serif",
+          fontFamily: "Manrope, sans-serif",
           fontSize: "12px",
           fontWeight: "500",
           letterSpacing: "0.04em",
