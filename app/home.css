@@ -121,8 +121,6 @@
     padding: 32px 12px 24px;
   }
 }
-  display: flex; align-items: center; gap: 10px;
-}
 .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(59, 130, 246, 0.5); }
 .btn-hero-secondary {
   font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 400;
