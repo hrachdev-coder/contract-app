@@ -141,9 +141,11 @@
 .trust-avatar:first-child { margin-left: 0; }
 .trust-text { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 300; color: var(--text-secondary); }
 .trust-text strong { font-weight: 600; color: var(--text-primary); }
-
-/* hero visual */
-.hero-visual { position: relative; }
+.btn-hero-primary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .card-main {
   background: var(--surface); border: 1px solid var(--border); border-radius: 28px;
   padding: 32px; position: relative; z-index: 2;
