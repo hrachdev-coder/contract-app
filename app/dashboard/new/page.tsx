@@ -292,43 +292,29 @@ export default function NewContractPage() {
     return (
       <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
         <HomeHeader />
-        <div className="contract-form-container">
-          <div className="contract-form-wrapper">
-            <div className="contract-form-header">
-              <h1 className="contract-form-title">Upgrade to <em>create contracts</em></h1>
-              <p className="contract-form-subtitle">
-                Your workspace needs an active LemonSqueezy subscription before you can send new contracts.
+        <div className="contract-form-container" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh" }}>
+          <div className="contract-form-wrapper" style={{ width: "100%", maxWidth: 900, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 2px 16px #0001", padding: 32 }}>
+            <div className="contract-form-header" style={{ textAlign: "center", marginBottom: 24 }}>
+              <h1 className="contract-form-title" style={{ fontSize: 32, marginBottom: 8 }}>Billing Required</h1>
+              <p className="contract-form-subtitle" style={{ fontSize: 18, color: "#64748b" }}>
+                You need an active subscription to create new contracts.<br />
+                <span style={{ fontSize: 15, color: "#b91c1c" }}>
+                  {billingError ? billingError : ""}
+                </span>
               </p>
             </div>
-
-            <div className="form-section" style={{ maxWidth: "720px", margin: "0 auto" }}>
-              <div className="form-section-header">
-                <div>
-                  <h2 className="form-section-title">Billing Required</h2>
-                  <p className="form-section-subtitle">
-                    Activate your paid plan to unlock contract creation, sending, and workflow automation.
-                  </p>
-                </div>
-              </div>
-              <div style={{ display: "grid", gap: "16px" }}>
-                <div style={{ color: "var(--text-secondary)", fontSize: "15px", lineHeight: 1.7 }}>
-                  <p style={{ margin: 0 }}>Your dashboard remains accessible, but creating new contracts is gated until billing is active.</p>
-                </div>
-                {billingError ? (
-                  <p style={{ margin: 0, color: "#b91c1c", fontSize: "13px" }}>{billingError}</p>
-                ) : null}
-                <BillingPlanGrid
-                  email={currentUser?.email || null}
-                  name={currentUser?.email?.split("@")[0] || null}
-                  userId={currentUser?.id || null}
-                  redirectPath="/dashboard/new"
-                  title="Activate a plan before you <em>send contracts</em>"
-                  subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
-                />
-                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-                  <Link href="/dashboard" className="btn-ghost">Back to dashboard</Link>
-                </div>
-              </div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+              <BillingPlanGrid
+                email={currentUser?.email || null}
+                name={currentUser?.email?.split("@")[0] || null}
+                userId={currentUser?.id || null}
+                redirectPath="/dashboard/new"
+                title="Activate a plan before you <em>send contracts</em>"
+                subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
+              />
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Link href="/dashboard" className="btn-ghost">Back to dashboard</Link>
             </div>
           </div>
         </div>
