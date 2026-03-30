@@ -26,11 +26,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Unknown billing plan." }, { status: 400 });
     }
 
+    const planId = body.planId && isBillingPlanId(body.planId) ? body.planId : undefined;
+
     const checkoutUrl = await createLemonSqueezyCheckout({
       email: body.email,
       name: body.name,
       userId: body.userId,
-      planId: body.planId,
+      planId,
       redirectPath: body.redirectPath || "/dashboard",
     });
 
