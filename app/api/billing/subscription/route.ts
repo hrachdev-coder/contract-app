@@ -41,6 +41,24 @@ export async function GET() {
     .maybeSingle<SubscriptionRow>();
 
   if (error) {
+    const code = (error as { code?: string }).code || "";
+    const message = error.message || "";
+
+    // Surface a clear setup error when billing table migration has not been applied yet.
+    if (
+      code === "PGRST205" ||
+      /subscriptions/i.test(message) && /not found|does not exist/i.test(message)
+    ) {
+      return NextResponse.json(
+        {
+          message:
+            "Billing subscriptions table is missing. Run supabase/migrations/20260329_billing_subscriptions.sql.",
+          needsBillingMigration: true,
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 

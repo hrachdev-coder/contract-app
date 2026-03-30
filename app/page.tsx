@@ -1,6 +1,7 @@
 import Link from "next/link";
 import "./home.css";
 import HomeHeader from "./components/HomeHeader";
+import BillingPlanGrid from "./components/BillingPlanGrid";
 import LemonSqueezyCheckoutButton from "./components/LemonSqueezyCheckoutButton";
 
 export default function HomePage() {
@@ -37,6 +38,7 @@ export default function HomePage() {
             <LemonSqueezyCheckoutButton
               label="Go Pro"
               className="btn-ghost"
+              planId="pro"
               redirectPath="/dashboard"
             />
           </div>
@@ -262,6 +264,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <BillingPlanGrid />
+
       {/* ── TESTIMONIALS ── */}
       <section id="reviews" className="testi-section">
         <div className="testi-head">
@@ -314,6 +318,7 @@ export default function HomePage() {
             <LemonSqueezyCheckoutButton
               label="Upgrade with LemonSqueezy"
               className="btn-cta-ghost"
+              planId="pro"
               redirectPath="/dashboard"
             />
           </div>

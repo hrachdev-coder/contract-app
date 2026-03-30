@@ -10,7 +10,7 @@ import type { User } from "@supabase/supabase-js";
 import { createEmptyContractData } from "@/lib/contract/schema";
 import { CONTRACT_TEMPLATES, type ContractTemplate } from "@/lib/contract/templates";
 import EnglishDatePicker from "../../components/EnglishDatePicker";
-import LemonSqueezyCheckoutButton from "../../components/LemonSqueezyCheckoutButton";
+import BillingPlanGrid from "../../components/BillingPlanGrid";
 import "../../contract-form.css";
 import "../../home.css";
 import HomeHeader from "../../components/HomeHeader";
@@ -317,15 +317,15 @@ export default function NewContractPage() {
                 {billingError ? (
                   <p style={{ margin: 0, color: "#b91c1c", fontSize: "13px" }}>{billingError}</p>
                 ) : null}
+                <BillingPlanGrid
+                  email={currentUser?.email || null}
+                  name={currentUser?.email?.split("@")[0] || null}
+                  userId={currentUser?.id || null}
+                  redirectPath="/dashboard/new"
+                  title="Activate a plan before you <em>send contracts</em>"
+                  subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
+                />
                 <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-                  <LemonSqueezyCheckoutButton
-                    label="Activate subscription"
-                    className="form-submit"
-                    email={currentUser?.email || null}
-                    name={currentUser?.email?.split("@")[0] || null}
-                    userId={currentUser?.id || null}
-                    redirectPath="/dashboard/new"
-                  />
                   <Link href="/dashboard" className="btn-ghost">Back to dashboard</Link>
                 </div>
               </div>

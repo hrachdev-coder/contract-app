@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { createLemonSqueezyCheckout, isLemonSqueezyEnabled } from "@/lib/billing/lemonsqueezy";
+import {
+  createLemonSqueezyCheckout,
+  isBillingPlanId,
+  isLemonSqueezyEnabled,
+} from "@/lib/billing/lemonsqueezy";
 
 export async function POST(request: Request) {
   if (!isLemonSqueezyEnabled()) {
@@ -14,13 +18,19 @@ export async function POST(request: Request) {
       email?: string;
       name?: string;
       userId?: string;
+      planId?: string;
       redirectPath?: string;
     };
+
+    if (body.planId && !isBillingPlanId(body.planId)) {
+      return NextResponse.json({ message: "Unknown billing plan." }, { status: 400 });
+    }
 
     const checkoutUrl = await createLemonSqueezyCheckout({
       email: body.email,
       name: body.name,
       userId: body.userId,
+      planId: body.planId,
       redirectPath: body.redirectPath || "/dashboard",
     });
 

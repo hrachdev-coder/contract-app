@@ -2,6 +2,10 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const LEMON_SQUEEZY_API_URL = "https://api.lemonsqueezy.com/v1/checkouts";
 
+export type BillingPlanId = "start" | "pro" | "business";
+
+const BILLING_PLAN_ORDER: BillingPlanId[] = ["start", "pro", "business"];
+
 export type BillingSubscriptionStatus =
   | "active"
   | "on_trial"
@@ -15,7 +19,7 @@ export type BillingSubscriptionStatus =
 type LemonSqueezyConfig = {
   apiKey: string;
   storeId: string;
-  variantId: string;
+  variantIds: Partial<Record<BillingPlanId, string>>;
   appUrl: string;
   testMode: boolean;
 };
@@ -55,6 +59,7 @@ type CreateCheckoutOptions = {
   email?: string | null;
   name?: string | null;
   userId?: string | null;
+  planId?: BillingPlanId;
   redirectPath?: string;
   cancelPath?: string;
 };
@@ -81,6 +86,18 @@ function getWebhookSecret() {
 
 function asString(value: unknown) {
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function getVariantIds() {
+  const start = process.env.LEMONSQUEEZY_VARIANT_ID_START || null;
+  const pro = process.env.LEMONSQUEEZY_VARIANT_ID_PRO || process.env.LEMONSQUEEZY_VARIANT_ID || null;
+  const business = process.env.LEMONSQUEEZY_VARIANT_ID_BUSINESS || null;
+
+  return {
+    start: start || undefined,
+    pro: pro || undefined,
+    business: business || undefined,
+  } satisfies Partial<Record<BillingPlanId, string>>;
 }
 
 function asStatus(value: unknown): BillingSubscriptionStatus {
@@ -119,23 +136,52 @@ function readCustomUserId(payload: LemonSqueezyWebhookPayload, attributes: Recor
 export function getLemonSqueezyConfig(): LemonSqueezyConfig | null {
   const apiKey = process.env.LEMONSQUEEZY_API_KEY;
   const storeId = process.env.LEMONSQUEEZY_STORE_ID;
-  const variantId = process.env.LEMONSQUEEZY_VARIANT_ID;
+  const variantIds = getVariantIds();
 
-  if (!apiKey || !storeId || !variantId) {
+  if (!apiKey || !storeId || Object.keys(variantIds).length === 0) {
     return null;
   }
 
   return {
     apiKey,
     storeId,
-    variantId,
+    variantIds,
     appUrl: getBaseAppUrl(),
     testMode: process.env.LEMONSQUEEZY_TEST_MODE === "true",
   };
 }
 
+export function isBillingPlanId(value: string | null | undefined): value is BillingPlanId {
+  return value === "start" || value === "pro" || value === "business";
+}
+
+export function getConfiguredBillingPlans() {
+  const config = getLemonSqueezyConfig();
+
+  if (!config) {
+    return [] as BillingPlanId[];
+  }
+
+  return BILLING_PLAN_ORDER.filter((planId) => Boolean(config.variantIds[planId]));
+}
+
+export function getDefaultBillingPlan() {
+  const configuredPlans = getConfiguredBillingPlans();
+
+  if (configuredPlans.includes("pro")) {
+    return "pro" as BillingPlanId;
+  }
+
+  return configuredPlans[0] || null;
+}
+
 export function isLemonSqueezyEnabled() {
   return Boolean(getLemonSqueezyConfig());
+}
+
+export function isBillingPlanConfigured(planId: BillingPlanId) {
+  const config = getLemonSqueezyConfig();
+  return Boolean(config?.variantIds[planId]);
 }
 
 export function isPaidSubscriptionStatus(status: string | null | undefined) {
@@ -218,6 +264,19 @@ export async function createLemonSqueezyCheckout(options: CreateCheckoutOptions 
     throw new Error("LemonSqueezy is not configured.");
   }
 
+  const fallbackPlanId = getDefaultBillingPlan();
+  const planId = options.planId || fallbackPlanId;
+
+  if (!planId) {
+    throw new Error("No LemonSqueezy plans are configured.");
+  }
+
+  const variantId = config.variantIds[planId];
+
+  if (!variantId) {
+    throw new Error(`The ${planId} plan is not configured in LemonSqueezy.`);
+  }
+
   const response = await fetch(LEMON_SQUEEZY_API_URL, {
     method: "POST",
     headers: {
@@ -261,7 +320,7 @@ export async function createLemonSqueezyCheckout(options: CreateCheckoutOptions 
           variant: {
             data: {
               type: "variants",
-              id: config.variantId,
+              id: variantId,
             },
           },
         },

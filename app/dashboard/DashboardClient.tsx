@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import ResendContractButton from "../components/ResendContractButton";
 import FinalizeContractButton from "../components/FinalizeContractButton";
+import BillingPlanGrid from "../components/BillingPlanGrid";
 import DeleteContractButton from "../components/DeleteContractButton";
 import LemonSqueezyCheckoutButton from "../components/LemonSqueezyCheckoutButton";
 import LogoutButton from "../components/LogoutButton";
@@ -257,16 +258,30 @@ export default function DashboardClient() {
               ) : null}
             </div>
           ) : null}
-          <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
-            <LemonSqueezyCheckoutButton
-              label={billing?.hasActiveAccess ? "Change Plan" : "Upgrade Your Workspace"}
-              className="btn-primary"
-              email={user?.email || null}
-              name={user?.email?.split("@")[0] || null}
-              userId={user?.id || null}
-              redirectPath="/dashboard"
-            />
-          </div>
+          {billing?.configured ? (
+            <div style={{ marginTop: "28px" }}>
+              <BillingPlanGrid
+                email={user?.email || null}
+                name={user?.email?.split("@")[0] || null}
+                userId={user?.id || null}
+                redirectPath="/dashboard"
+                title={billing?.hasActiveAccess ? "Change or upgrade your <em>workspace plan</em>" : "Choose a plan to <em>unlock your workspace</em>"}
+                subtitle={billing?.hasActiveAccess ? "Switch plans any time through a new hosted checkout. Your current subscription details stay visible below." : "Pick the plan that matches your current client volume and billing will unlock after the webhook confirms it."}
+              />
+            </div>
+          ) : (
+            <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+              <LemonSqueezyCheckoutButton
+                label="Upgrade Your Workspace"
+                className="btn-primary"
+                email={user?.email || null}
+                name={user?.email?.split("@")[0] || null}
+                userId={user?.id || null}
+                planId="pro"
+                redirectPath="/dashboard"
+              />
+            </div>
+          )}
           
           <div className="stats-grid">
             <div className="stat-card">

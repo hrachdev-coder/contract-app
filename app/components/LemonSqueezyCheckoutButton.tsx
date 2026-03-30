@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 
+type BillingPlanId = "start" | "pro" | "business";
+
 type LemonSqueezyCheckoutButtonProps = {
   label: string;
   className: string;
   email?: string | null;
   name?: string | null;
   userId?: string | null;
+  planId?: BillingPlanId;
   redirectPath?: string;
 };
 
@@ -29,6 +32,7 @@ export default function LemonSqueezyCheckoutButton(props: LemonSqueezyCheckoutBu
           email: props.email,
           name: props.name,
           userId: props.userId,
+          planId: props.planId,
           redirectPath: props.redirectPath,
         }),
       });
