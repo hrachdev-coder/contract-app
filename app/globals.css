@@ -1,26 +1,19 @@
-@import "tailwindcss";
+/* globals.css - Base global styles for the app */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Manrope', 'Sora', 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: #f9f7f6;
+  color: #2d2320;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: "Manrope", "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "Consolas", monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Manrope", "Segoe UI", sans-serif;
+  min-height: 100vh;
 }

@@ -13,8 +13,8 @@ export default function HomePage() {
       <HomeHeader />
 
       {/* ── HERO ── */}
-      <section className="hero">
-        <div>
+      <section className="hero-section">
+        <div className="hero-section-left">
           <div className="hero-eyebrow">
             <span className="eyebrow-dot" />
             Trusted by 3,400+ service businesses
