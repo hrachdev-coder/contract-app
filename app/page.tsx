@@ -20,7 +20,7 @@ export default function HomePage() {
             Trusted by 3,400+ service businesses
           </div>
           <h1 className="hero-title">
-            Your client contracts,<br /><em>handled</em> with elegance
+            Your client contracts,<br /><em>handled </em> with elegance
           </h1>
           <p className="hero-sub">
             Generate professional client contracts in minutes, send them for signature, and track every step from one beautiful dashboard.

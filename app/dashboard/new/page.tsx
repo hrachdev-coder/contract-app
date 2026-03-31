@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient, getUserOrNull } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { ContractData } from "@/app/types/contracts";
@@ -14,7 +14,6 @@ import BillingPlanGrid from "../../components/BillingPlanGrid";
 import "../../contract-form.css";
 import "../../home.css";
 import HomeHeader from "../../components/HomeHeader";
-import { useEffect } from "react";
 import Link from "next/link";
 
 type UsageRightOption = {
@@ -113,6 +112,8 @@ export default function NewContractPage() {
   const [billingConfigured, setBillingConfigured] = useState(false);
   const [hasActiveAccess, setHasActiveAccess] = useState(true);
   const [billingError, setBillingError] = useState<string | null>(null);
+  const [freePlanContractCount, setFreePlanContractCount] = useState<number | null>(null);
+  const [planName, setPlanName] = useState<string | null>(null);
   const isSocialTemplate = form.contractTemplate === "instagram";
   const rightsTermsContent = getRightsTermsContent(form.contractTemplate);
 
@@ -141,10 +142,21 @@ export default function NewContractPage() {
         const payload = (await response.json()) as {
           configured: boolean;
           hasActiveAccess: boolean;
+          subscription?: { plan_name?: string | null } | null;
         };
 
         setBillingConfigured(payload.configured);
         setHasActiveAccess(payload.hasActiveAccess);
+        setPlanName(payload.subscription?.plan_name || (payload.subscription === null ? "free" : null));
+
+        // If on free plan, count contracts
+        if ((payload.subscription?.plan_name || "").toLowerCase() === "start" || (payload.subscription?.plan_name || "").toLowerCase() === "free") {
+          const { count, error } = await supabase
+            .from("contracts")
+            .select("id", { count: "exact", head: true })
+            .eq("influencer_id", user.id);
+          if (!error) setFreePlanContractCount(count || 0);
+        }
       } catch (nextError) {
         setBillingError(
           nextError instanceof Error ? nextError.message : "Unable to verify billing access."
@@ -195,8 +207,21 @@ export default function NewContractPage() {
     setLoading(true);
     setError(null);
 
-    if (billingConfigured && !hasActiveAccess) {
-      setError("An active subscription is required to create new contracts.");
+    // Block only if:
+    // - Billing enabled
+    // - No active access
+    // - Not on free plan, or on free plan but already has a contract
+    const isFreePlan = (planName || "").toLowerCase() === "start" || (planName || "").toLowerCase() === "free";
+    if (
+      billingConfigured &&
+      !hasActiveAccess &&
+      (!isFreePlan || (isFreePlan && freePlanContractCount !== null && freePlanContractCount > 0))
+    ) {
+      setError(
+        isFreePlan
+          ? "You can only create one contract on the free plan. Upgrade to add more."
+          : "An active subscription is required to create new contracts."
+      );
       setLoading(false);
       return;
     }
@@ -293,7 +318,7 @@ export default function NewContractPage() {
       <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
         <HomeHeader />
         <div className="contract-form-container" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh" }}>
-          <div className="contract-form-wrapper" style={{ width: "100%", maxWidth: 900, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 2px 16px #0001", padding: 32 }}>
+          <div className="contract-form-wrapper" style={{ width: "100%", maxWidth: 1280, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 2px 16px #0001", padding: 32 }}>
             <div className="contract-form-header" style={{ textAlign: "center", marginBottom: 24 }}>
               <h1 className="contract-form-title" style={{ fontSize: 32, marginBottom: 8 }}>Billing Required</h1>
               <p className="contract-form-subtitle" style={{ fontSize: 18, color: "#64748b" }}>
@@ -310,6 +335,45 @@ export default function NewContractPage() {
                 userId={currentUser?.id || null}
                 redirectPath="/dashboard/new"
                 title="Activate a plan before you <em>send contracts</em>"
+                subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
+              />
+            </div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Link href="/dashboard" className="btn-ghost">Back to dashboard</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Block if on free plan and already has a contract
+  if (
+    billingConfigured &&
+    !hasActiveAccess &&
+    (planName?.toLowerCase() === "start" || planName?.toLowerCase() === "free") &&
+    freePlanContractCount !== null &&
+    freePlanContractCount > 0
+  ) {
+    return (
+      <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
+        <HomeHeader />
+        <div className="contract-form-container" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh" }}>
+          <div className="contract-form-wrapper" style={{ width: "100%", maxWidth: 1280, margin: "0 auto", background: "#fff", borderRadius: 18, boxShadow: "0 2px 16px #0001", padding: 32 }}>
+            <div className="contract-form-header" style={{ textAlign: "center", marginBottom: 24 }}>
+              <h1 className="contract-form-title" style={{ fontSize: 32, marginBottom: 8 }}>Free Plan Limit</h1>
+              <p className="contract-form-subtitle" style={{ fontSize: 18, color: "#64748b" }}>
+                You can only create <b>one contract</b> on the free plan.<br />
+                Upgrade your plan to add more contracts.
+              </p>
+            </div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+              <BillingPlanGrid
+                email={currentUser?.email || null}
+                name={currentUser?.email?.split("@")[0] || null}
+                userId={currentUser?.id || null}
+                redirectPath="/dashboard/new"
+                title="Upgrade to unlock unlimited contracts"
                 subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
               />
             </div>

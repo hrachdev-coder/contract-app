@@ -15,6 +15,7 @@ import type { ContractData, ContractStatus } from "@/app/types/contracts";
 import { getContractTemplateById } from "@/lib/contract/templates";
 import "./dashboard.css";
 import "../home.css";
+import HomeHeader from "../components/HomeHeader";
 
 type Contract = {
   id: string;
@@ -189,27 +190,8 @@ export default function DashboardClient() {
   return (
     <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
       {/* ── NAV ── */}
-      <nav className="nav">
-        <div className="nav-inner">
-          <Link href="/" className="logo">
-            <div className="logo-mark">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M3 4.5h12M3 9h8M3 13.5h10" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <span className="logo-text">Contrakt</span>
-          </Link>
-          <div className="nav-links">
-            <Link href="/#features" className="nav-link">Features</Link>
-            <Link href="/#how-it-works" className="nav-link">How it works</Link>
-            <Link href="/#reviews" className="nav-link">Reviews</Link>
-            <div className="nav-divider" />
-            <Link href="/dashboard" className="btn-ghost">Dashboard</Link>
-            <LogoutButton />
-          </div>
-        </div>
-      </nav>
-
+      <HomeHeader />
+      {/* ...existing code... */}
       <div className="dashboard-container">
         <div className="dashboard-header">
           <h1 className="dashboard-title">Welcome back,<br /><em>{user?.email?.split('@')[0]}</em></h1>

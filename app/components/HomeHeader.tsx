@@ -7,6 +7,7 @@ import LogoutButton from "./LogoutButton";
 
 export default function HomeHeader() {
   const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -45,6 +46,13 @@ export default function HomeHeader() {
           </div>
           <span className="logo-text">Contrakt</span>
         </Link>
+        <button className="nav-hamburger" onClick={() => setMobileMenuOpen(v => !v)} aria-label="Open menu">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect y="6" width="28" height="2.5" rx="1.25" fill="#3b82f6" />
+            <rect y="13" width="28" height="2.5" rx="1.25" fill="#3b82f6" />
+            <rect y="20" width="28" height="2.5" rx="1.25" fill="#3b82f6" />
+          </svg>
+        </button>
         <div className="nav-links">
           <Link href="/#features" className="nav-link">Features</Link>
           <Link href="/#how-it-works" className="nav-link">How it works</Link>
@@ -63,6 +71,28 @@ export default function HomeHeader() {
           )}
         </div>
       </div>
+      {mobileMenuOpen && (
+        <div className="mobile-nav-drawer" onClick={() => setMobileMenuOpen(false)}>
+          <div className="mobile-nav-content" onClick={e => e.stopPropagation()}>
+            <button className="mobile-nav-close" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">×</button>
+            <Link href="/#features" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Features</Link>
+            <Link href="/#how-it-works" className="nav-link" onClick={() => setMobileMenuOpen(false)}>How it works</Link>
+            <Link href="/#reviews" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Reviews</Link>
+            <div className="nav-divider" />
+            {user ? (
+              <>
+                <Link href="/dashboard" className="btn-ghost" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+                <LogoutButton />
+              </>
+            ) : (
+              <>
+                <Link href="/login"    className="btn-ghost" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
+                <Link href="/register" className="btn-filled" onClick={() => setMobileMenuOpen(false)}>Get started</Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
