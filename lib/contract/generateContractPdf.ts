@@ -25,13 +25,6 @@ export async function generateContractPdfBuffer(args: {
     size: "A4",
     margin: 50,
     font: fontPath,
-    info: {
-      Title: "Client Service Agreement",
-      Author: employerName,
-      Subject: `CSA - ${contractData.brandName || "Contract"}`,
-      Keywords: "contract, agreement, legal",
-      Creator: "Contract Generator v1.0",
-    },
   });
 
   const buffers: Uint8Array[] = [];
