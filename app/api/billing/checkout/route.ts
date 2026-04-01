@@ -4,6 +4,7 @@ import {
   isBillingPlanId,
   isLemonSqueezyEnabled,
 } from "@/lib/billing/lemonsqueezy";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   if (!isLemonSqueezyEnabled()) {
@@ -14,6 +15,15 @@ export async function POST(request: Request) {
   }
 
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = (await request.json().catch(() => ({}))) as {
       email?: string;
       name?: string;
@@ -29,9 +39,10 @@ export async function POST(request: Request) {
     const planId = body.planId && isBillingPlanId(body.planId) ? body.planId : undefined;
 
     const checkoutUrl = await createLemonSqueezyCheckout({
-      email: body.email,
+      email: body.email || user.email,
       name: body.name,
-      userId: body.userId,
+      // Always bind checkout to the authenticated user to ensure webhook mapping works.
+      userId: user.id,
       planId,
       redirectPath: body.redirectPath || "/dashboard",
     });
