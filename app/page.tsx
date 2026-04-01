@@ -17,7 +17,7 @@ export default function HomePage() {
         <div>
           <div className="hero-eyebrow">
             <span className="eyebrow-dot" />
-            Trusted by 3,400+ service businesses
+            Trusted by 240+ service businesses
           </div>
           <h1 className="hero-title">
             Your client contracts,<br /><em>handled </em> with elegance
@@ -53,7 +53,7 @@ export default function HomePage() {
                 <div key={i} className="trust-avatar" style={{ background: a.bg, color: a.color }}>{a.t}</div>
               ))}
             </div>
-            <p className="trust-text"><strong>3,400+</strong> teams already closing deals faster</p>
+            <p className="trust-text"><strong>240+</strong> teams already closing deals faster</p>
           </div>
         </div>
 
@@ -122,9 +122,9 @@ export default function HomePage() {
       <div className="stats-row">
         <div className="stats-inner">
           {[
-            { n:"3,400", e:"+",  l:"Active businesses"   },
-            { n:"$12",   e:"M+", l:"Contracts generated" },
-            { n:"98",    e:"%",  l:"Satisfaction rate"   },
+            { n:"240", e:"+",  l:"Active businesses"   },
+            { n:"$20",   e:"k+", l:"Contracts generated" },
+            { n:"92",    e:"%",  l:"Satisfaction rate"   },
           ].map((s,i) => (
             <div key={i} className="stat-cell">
               <div className="stat-num">{s.n}<em>{s.e}</em></div>
@@ -306,7 +306,7 @@ export default function HomePage() {
           <div className="cta-deco cta-deco-1" />
           <div className="cta-deco cta-deco-2" />
           <h2 className="cta-title">Ready to run contracts like a<br /><em>professional team?</em></h2>
-          <p className="cta-sub">Join 3,400+ freelancers and agencies who close deals faster and get paid on time.</p>
+          <p className="cta-sub">Join 240+ freelancers and agencies who close deals faster and get paid on time.</p>
           <div className="cta-actions">
             <a href="/register" className="btn-cta-primary">
               Create your first contract

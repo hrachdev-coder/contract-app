@@ -88,16 +88,36 @@ export function buildContractSections(args: {
       body: exclusivityText,
     },
     {
-      title: "8. Confidentiality",
-      body: "Both parties agree to keep confidential any non-public business, project, pricing, or strategic information received during this engagement.",
+      title: "8. Intellectual Property",
+      body: "All work, deliverables, and intellectual property created by Company under this Agreement remain the property of Company unless expressly transferred in writing. Client receives only the usage rights specified in Section 5.",
     },
     {
-      title: "9. Termination",
-      body: "Either party may terminate this Agreement for material breach if the breach is not cured within a reasonable written notice period. Completed and approved work remains payable.",
+      title: "9. Confidentiality",
+      body: "Both parties agree to keep confidential any non-public business, project, pricing, or strategic information received during this engagement. This obligation survives termination of the Agreement.",
     },
     {
-      title: "10. Acceptance",
-      body: "By approving this Agreement, both parties confirm they have read, understood, and agreed to the terms stated above.",
+      title: "10. Limitation of Liability",
+      body: "Neither party shall be liable for indirect, incidental, consequential, or punitive damages arising from this Agreement. Each party's total liability is limited to the fees paid or owed under this Agreement.",
+    },
+    {
+      title: "11. Force Majeure",
+      body: "Neither party shall be liable for failure to perform obligations due to unforeseeable circumstances beyond reasonable control, including natural disasters, pandemics, government actions, or acts of God. The affected party must provide written notice and make reasonable efforts to resume performance.",
+    },
+    {
+      title: "12. Dispute Resolution",
+      body: "Disputes shall be resolved through good faith negotiation. If negotiation fails, disputes will be resolved through binding arbitration or mediation as mutually agreed, under the rules of the jurisdiction where the Company resides. Both parties waive the right to jury trial.",
+    },
+    {
+      title: "13. Termination",
+      body: "Either party may terminate this Agreement for material breach if the breach is not cured within 14 days of written notice. Upon termination, completed and approved work remains payable, and all confidentiality obligations survive termination.",
+    },
+    {
+      title: "14. Entire Agreement",
+      body: "This Agreement, including all referenced templates and attachments, constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, and agreements. Any amendments must be made in writing and signed by both parties.",
+    },
+    {
+      title: "15. Acceptance",
+      body: "By approving this Agreement, both parties confirm they have read, understood, and agreed to the terms stated above. Electronic signatures are binding and equivalent to original signatures.",
     },
   ];
 }
