@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import type { ContractData } from "@/app/types/contracts";
+import { getRequestBaseUrl } from "@/lib/app-url";
 import { normalizeContractData } from "@/lib/contract/schema";
 
 type ResendRouteContext = {
@@ -71,7 +72,7 @@ export async function POST(req: Request, context: ResendRouteContext) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
-    const baseUrl = new URL(req.url).origin;
+    const baseUrl = getRequestBaseUrl(req);
     const reviewUrl = `${baseUrl}/contract/${contract.public_token}`;
     const employerName = contract.influencer_email || "Your contract contact";
 

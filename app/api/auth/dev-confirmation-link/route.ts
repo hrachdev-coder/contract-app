@@ -2,6 +2,7 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { getRequestBaseUrl } from "@/lib/app-url";
 
 export async function POST(req: Request) {
   try {
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     const supabase = createServiceClient();
-    const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback?next=/dashboard`;
+    const redirectTo = `${getRequestBaseUrl(req)}/auth/callback?next=/dashboard`;
 
     const { data, error } = await supabase.auth.admin.generateLink({
       type: "magiclink",

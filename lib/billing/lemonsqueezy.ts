@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
+import { getConfiguredAppUrl } from "@/lib/app-url";
 
 const LEMON_SQUEEZY_API_URL = "https://api.lemonsqueezy.com/v1/checkouts";
 
@@ -77,7 +78,7 @@ type LemonSqueezyCheckoutResponse = {
 };
 
 function getBaseAppUrl() {
-  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  return getConfiguredAppUrl();
 }
 
 function getWebhookSecret() {

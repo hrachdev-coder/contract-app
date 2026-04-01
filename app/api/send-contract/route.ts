@@ -5,6 +5,7 @@ import { Resend } from "resend";
 
 import { normalizeContractData } from "@/lib/contract/schema";
 import { getContractTemplateById } from "@/lib/contract/templates";
+import { getRequestBaseUrl } from "@/lib/app-url";
 
 export async function POST(req: Request) {
   try {
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
     const normalizedContractData = normalizeContractData(contractData, email);
   const template = getContractTemplateById(normalizedContractData.contractTemplate);
 
-    const baseUrl = new URL(req.url).origin;
+    const baseUrl = getRequestBaseUrl(req);
     const reviewUrl = `${baseUrl}/contract/${publicToken}`;
 
     const subject = `Service contract from ${employerName}`;
