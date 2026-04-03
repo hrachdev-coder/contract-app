@@ -7,8 +7,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { contractId } = body;
 
-    console.log("Simple Delete API called with contractId:", contractId);
-
     if (!contractId) {
       return NextResponse.json(
         { success: false, message: "Contract ID is required" },

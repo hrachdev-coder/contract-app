@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [resending, setResending] = useState(false);
   const [devLinkLoading, setDevLinkLoading] = useState(false);
   const [devSignInLink, setDevSignInLink] = useState<string | null>(null);
+  const isDevMode = process.env.NODE_ENV !== "production";
 
   const emailRedirectTo =
     typeof window !== "undefined"
@@ -187,26 +188,30 @@ export default function LoginPage() {
               {resending ? "Resending confirmation..." : "Resend confirmation email"}
             </button>
 
-            <button
-              type="button"
-              onClick={handleGenerateDevSignInLink}
-              disabled={devLinkLoading || loading}
-              className="auth-submit"
-              style={{
-                marginTop: "10px",
-                background: "transparent",
-                color: "#0f172a",
-                border: "1px solid #cbd5e1",
-              }}
-            >
-              {devLinkLoading ? "Generating link..." : "Generate dev sign-in link"}
-            </button>
+            {isDevMode ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleGenerateDevSignInLink}
+                  disabled={devLinkLoading || loading}
+                  className="auth-submit"
+                  style={{
+                    marginTop: "10px",
+                    background: "transparent",
+                    color: "#0f172a",
+                    border: "1px solid #cbd5e1",
+                  }}
+                >
+                  {devLinkLoading ? "Generating link..." : "Generate dev sign-in link"}
+                </button>
 
-            {devSignInLink && (
-              <p style={{ fontSize: "13px", marginTop: "10px", wordBreak: "break-all" }}>
-                Dev link: <a href={devSignInLink}>{devSignInLink}</a>
-              </p>
-            )}
+                {devSignInLink && (
+                  <p style={{ fontSize: "13px", marginTop: "10px", wordBreak: "break-all" }}>
+                    Dev link: <a href={devSignInLink}>{devSignInLink}</a>
+                  </p>
+                )}
+              </>
+            ) : null}
           </form>
 
           <div className="auth-footer">

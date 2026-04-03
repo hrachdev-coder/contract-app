@@ -45,6 +45,38 @@ export async function POST(request: Request) {
     userId = existingSubscription?.user_id || "";
   }
 
+  if (!userId && record.customerEmail) {
+    const targetEmail = record.customerEmail.toLowerCase();
+    let page = 1;
+    const perPage = 200;
+
+    while (!userId) {
+      const { data: usersPage, error: usersError } = await service.auth.admin.listUsers({
+        page,
+        perPage,
+      });
+
+      if (usersError || !usersPage?.users?.length) {
+        break;
+      }
+
+      const matchedUser = usersPage.users.find(
+        (item) => (item.email || "").toLowerCase() === targetEmail
+      );
+
+      if (matchedUser?.id) {
+        userId = matchedUser.id;
+        break;
+      }
+
+      if (usersPage.users.length < perPage) {
+        break;
+      }
+
+      page += 1;
+    }
+  }
+
   if (!userId) {
     return NextResponse.json(
       { message: "Webhook payload is missing a user reference." },

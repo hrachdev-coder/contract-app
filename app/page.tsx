@@ -3,8 +3,93 @@ import "./home.css";
 import HomeHeader from "./components/HomeHeader";
 import BillingPlanGrid from "./components/BillingPlanGrid";
 import LemonSqueezyCheckoutButton from "./components/LemonSqueezyCheckoutButton";
+import { createClient } from "@/lib/supabase/server";
+import type { ContractData } from "@/app/types/contracts";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+type HomeContractRow = {
+  id: string;
+  status: string;
+  created_at: string;
+  contract_data: Partial<ContractData> | null;
+};
+
+function parseAmount(value: string | null | undefined) {
+  if (!value) {
+    return 0;
+  }
+
+  const normalized = value.replace(/[^0-9.]/g, "");
+  const amount = Number.parseFloat(normalized);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+function formatAmount(amount: number, currencySymbol: string) {
+  const safeAmount = Number.isFinite(amount) ? Math.max(0, amount) : 0;
+  return `${currencySymbol}${safeAmount.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+}
+
+function getStatusUi(status: string) {
+  const normalized = status.toLowerCase();
+
+  if (normalized === "completed" || normalized === "accepted") {
+    return { label: "signed", className: "badge-signed", dot: "#4caf50" };
+  }
+
+  if (normalized === "changes_requested") {
+    return { label: "review", className: "badge-review", dot: "#e91e63" };
+  }
+
+  return { label: "pending", className: "badge-pending", dot: "#ff9800" };
+}
+
+export default async function HomePage() {
+  const currentYear = new Date().getFullYear();
+  let contracts: HomeContractRow[] = [];
+
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data } = await supabase
+        .from("contracts")
+        .select("id, status, created_at, contract_data")
+        .eq("influencer_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20)
+        .returns<HomeContractRow[]>();
+
+      contracts = data || [];
+    }
+  } catch {
+    contracts = [];
+  }
+
+  const hasContracts = contracts.length > 0;
+  const defaultCurrency = contracts[0]?.contract_data?.currency || "$";
+  const totalValue = contracts.reduce(
+    (sum, contract) => sum + parseAmount(contract.contract_data?.paymentAmount),
+    0
+  );
+  const completedValue = contracts.reduce((sum, contract) => {
+    const normalized = contract.status.toLowerCase();
+    const isCompleted = normalized === "accepted" || normalized === "completed";
+    return isCompleted ? sum + parseAmount(contract.contract_data?.paymentAmount) : sum;
+  }, 0);
+  const completedPercent = totalValue > 0 ? Math.round((completedValue / totalValue) * 100) : 0;
+  const signedContract = contracts.find((contract) => {
+    const normalized = contract.status.toLowerCase();
+    return normalized === "accepted" || normalized === "completed";
+  });
+  const inProgressContract = contracts.find((contract) => {
+    const normalized = contract.status.toLowerCase();
+    return normalized === "sent" || normalized === "viewed" || normalized === "updated";
+  });
+  const previewContracts = contracts.slice(0, 4);
 
   return (
     <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
@@ -17,7 +102,7 @@ export default function HomePage() {
         <div>
           <div className="hero-eyebrow">
             <span className="eyebrow-dot" />
-            Trusted by 240+ service businesses
+            Built for service businesses worldwide
           </div>
           <h1 className="hero-title">
             Your client contracts,<br /><em>handled </em> with elegance
@@ -53,7 +138,7 @@ export default function HomePage() {
                 <div key={i} className="trust-avatar" style={{ background: a.bg, color: a.color }}>{a.t}</div>
               ))}
             </div>
-            <p className="trust-text"><strong>240+</strong> teams already closing deals faster</p>
+            <p className="trust-text"><strong>Global-ready</strong> workflow for service teams</p>
           </div>
         </div>
 
@@ -65,8 +150,12 @@ export default function HomePage() {
               </svg>
             </div>
             <div>
-              <div className="float-title">Contract Signed ✓</div>
-              <div className="float-sub">Northwind × Bright Studio — just now</div>
+              <div className="float-title">{signedContract ? "Latest Signed ✓" : "Contract Status"}</div>
+              <div className="float-sub">
+                {signedContract
+                  ? `${signedContract.contract_data?.brandName || "Contract"} · ${formatAmount(parseAmount(signedContract.contract_data?.paymentAmount), signedContract.contract_data?.currency || defaultCurrency)}`
+                  : "Sign in to see your latest signed contract"}
+              </div>
             </div>
           </div>
 
@@ -78,41 +167,84 @@ export default function HomePage() {
               </svg>
             </div>
             <div>
-              <div className="float-title">Awaiting Review</div>
-              <div className="float-sub">Nike campaign · $6,200</div>
+              <div className="float-title">{inProgressContract ? "Awaiting Review" : "In Progress"}</div>
+              <div className="float-sub">
+                {inProgressContract
+                  ? `${inProgressContract.contract_data?.brandName || "Contract"} · ${formatAmount(parseAmount(inProgressContract.contract_data?.paymentAmount), inProgressContract.contract_data?.currency || defaultCurrency)}`
+                  : "Your active contracts appear here"}
+              </div>
             </div>
           </div>
 
           <div className="card-main">
             <div className="card-chip">
               <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#d4826e"/></svg>
-              Q4 Campaigns Overview
+              {hasContracts ? "Your Contracts Overview" : "Dashboard Preview"}
             </div>
-            <div className="amount-display">$24,800</div>
-            <div className="amount-label">Total contract value · Oct–Dec 2024</div>
-            <div className="progress-bar-wrap"><div className="progress-bar-fill" /></div>
-            <div className="progress-meta"><span>72% collected</span><span>$17,856 received</span></div>
+            <div className="amount-display">{formatAmount(totalValue, defaultCurrency)}</div>
+            <div className="amount-label">
+              {hasContracts
+                ? `Total contract value · ${contracts.length} contracts`
+                : "Sign in to load your live contract data"}
+            </div>
+            <div className="progress-bar-wrap">
+              <div
+                className="progress-bar-fill"
+                style={{ width: `${Math.min(100, Math.max(0, completedPercent))}%` }}
+              />
+            </div>
+            <div className="progress-meta">
+              <span>{completedPercent}% completed</span>
+              <span>{formatAmount(completedValue, defaultCurrency)} completed</span>
+            </div>
             <div className="contract-items">
-              {[
-                { b:"Z", name:"Zara",       sub:"2 Reels · 4 Stories",  val:"$3,200", dot:"#4caf50", cls:"badge-signed",  s:"signed"  },
-                { b:"N", name:"Nike",        sub:"3 Reels · 1 Post",     val:"$6,200", dot:"#ff9800", cls:"badge-pending", s:"pending" },
-                { b:"A", name:"Aesop",       sub:"1 Reel · 2 Stories",   val:"$1,800", dot:"#e91e63", cls:"badge-review",  s:"review"  },
-                { b:"D", name:"Dior Beauty", sub:"4 Posts · 6 Stories",  val:"$9,400", dot:"#4caf50", cls:"badge-signed",  s:"signed"  },
-              ].map((c) => (
-                <div key={c.name} className="citem">
+              {hasContracts ? (
+                previewContracts.map((contract) => {
+                  const brandName = contract.contract_data?.brandName || "Untitled Contract";
+                  const statusUi = getStatusUi(contract.status);
+                  const amount = formatAmount(
+                    parseAmount(contract.contract_data?.paymentAmount),
+                    contract.contract_data?.currency || defaultCurrency
+                  );
+                  const subtitle =
+                    contract.contract_data?.deliverables ||
+                    contract.contract_data?.platform ||
+                    new Date(contract.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+
+                  return (
+                    <div key={contract.id} className="citem">
+                      <div className="citem-left">
+                        <div className="citem-dot" style={{ background: statusUi.dot }} />
+                        <div>
+                          <div className="citem-name">{brandName.slice(0, 1).toUpperCase()} - {brandName}</div>
+                          <div className="citem-sub">{subtitle}</div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign:"right" }}>
+                        <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)", marginBottom:4 }}>{amount}</div>
+                        <span className={`citem-badge ${statusUi.className}`}>{statusUi.label}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="citem">
                   <div className="citem-left">
-                    <div className="citem-dot" style={{ background: c.dot }} />
+                    <div className="citem-dot" style={{ background: "#94a3b8" }} />
                     <div>
-                      <div className="citem-name">{c.b} — {c.name}</div>
-                      <div className="citem-sub">{c.sub}</div>
+                      <div className="citem-name">No contracts yet</div>
+                      <div className="citem-sub">Create your first contract from the dashboard</div>
                     </div>
                   </div>
                   <div style={{ textAlign:"right" }}>
-                    <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)", marginBottom:4 }}>{c.val}</div>
-                    <span className={`citem-badge ${c.cls}`}>{c.s}</span>
+                    <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)", marginBottom:4 }}>$0</div>
+                    <span className="citem-badge badge-pending">new</span>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -122,9 +254,9 @@ export default function HomePage() {
       <div className="stats-row">
         <div className="stats-inner">
           {[
-            { n:"240", e:"+",  l:"Active businesses"   },
-            { n:"$20",   e:"k+", l:"Contracts generated" },
-            { n:"92",    e:"%",  l:"Satisfaction rate"   },
+            { n:"Fast", e:"", l:"Setup and onboarding" },
+            { n:"Clear", e:"", l:"Client review flow" },
+            { n:"Secure", e:"", l:"Audit-ready records" },
           ].map((s,i) => (
             <div key={i} className="stat-cell">
               <div className="stat-num">{s.n}<em>{s.e}</em></div>
@@ -146,7 +278,7 @@ export default function HomePage() {
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="3" width="20" height="20" rx="5" stroke="#d4826e" strokeWidth="1.6"/><path d="M8 9h10M8 13h7M8 17h5" stroke="#d4826e" strokeWidth="1.6" strokeLinecap="round"/><circle cx="20" cy="20" r="5" fill="#fce8e4" stroke="#d4826e" strokeWidth="1.4"/><path d="M18.5 20l1 1 2.5-2" stroke="#d4826e" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
               title: "Smart Contract Builder",
-              desc: "Answer a few questions and get a professionally formatted, legally-sound contract ready to send — in under 3 minutes.",
+              desc: "Answer a few questions and generate a clean, professional contract draft ready to send.",
             },
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M4 6h18v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" stroke="#d4826e" strokeWidth="1.6"/><path d="M9 6V4M17 6V4M4 11h18" stroke="#d4826e" strokeWidth="1.6" strokeLinecap="round"/><path d="M9 16l2 2 4-4" stroke="#d4826e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
@@ -156,12 +288,12 @@ export default function HomePage() {
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="9" stroke="#d4826e" strokeWidth="1.6"/><path d="M13 8v5.5l3.5 3.5" stroke="#d4826e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>,
               title: "Real-Time Status Tracking",
-              desc: "See every contract's status at a glance — opened, pending, signed, or overdue. Never chase a signature again.",
+              desc: "Track every contract state at a glance, from sent to reviewed to accepted.",
             },
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="7" width="20" height="15" rx="3" stroke="#d4826e" strokeWidth="1.6"/><path d="M17 7V6a4 4 0 00-8 0v1" stroke="#d4826e" strokeWidth="1.6" strokeLinecap="round"/><circle cx="13" cy="14" r="2.5" stroke="#d4826e" strokeWidth="1.5"/><path d="M13 16.5v2" stroke="#d4826e" strokeWidth="1.5" strokeLinecap="round"/></svg>,
               title: "Secure & Legally Binding",
-              desc: "Every signature includes a full audit trail, IP log, and timestamp — accepted as legally binding in 90+ countries.",
+              desc: "Each acceptance records consent text, timestamp, and audit metadata for stronger documentation.",
             },
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="3" width="9" height="9" rx="2" stroke="#d4826e" strokeWidth="1.6"/><rect x="14" y="3" width="9" height="9" rx="2" stroke="#d4826e" strokeWidth="1.6"/><rect x="3" y="14" width="9" height="9" rx="2" stroke="#d4826e" strokeWidth="1.6"/><circle cx="18.5" cy="18.5" r="4.5" fill="#fce8e4" stroke="#d4826e" strokeWidth="1.4"/><path d="M17 18.5h3M18.5 17v3" stroke="#d4826e" strokeWidth="1.3" strokeLinecap="round"/></svg>,
@@ -171,7 +303,7 @@ export default function HomePage() {
             {
               icon: <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 3l2.8 6 6.2.9-4.5 4.4 1 6.2-5.5-2.8-5.5 2.8 1-6.2-4.5-4.4 6.2-.9L13 3z" stroke="#d4826e" strokeWidth="1.6" strokeLinejoin="round" fill="#fce8e4"/></svg>,
               title: "Ready-Made Templates",
-              desc: "Start from our library: service agreements, project scopes, retainers, and licensing terms — crafted by legal experts.",
+              desc: "Start from practical templates for services, project scopes, retainers, and licensing terms.",
             },
           ].map((f) => (
             <div key={f.title} className="feat-card">
@@ -246,7 +378,7 @@ export default function HomePage() {
                   <div className={`mock-input ${f.filled ? "" : "placeholder"}`}>{f.val}</div>
                 </div>
               ))}
-              <button className="mock-btn">Generate Contract →</button>
+              <a href={hasContracts ? "/dashboard/new" : "/register"} className="mock-btn">Generate Contract →</a>
             </div>
 
             <div style={{ marginTop:14, background:"var(--white)", border:"1px solid rgba(201,168,160,0.3)", borderRadius:18, padding:"18px 20px", display:"flex", alignItems:"center", gap:14 }}>
@@ -256,8 +388,14 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)" }}>Contract sent to ops@northwind.com</div>
-                <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:12, color:"var(--muted)", marginTop:2 }}>Awaiting e-signature · expires in 7 days</div>
+                <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:13, fontWeight:600, color:"var(--ink)" }}>
+                  {inProgressContract
+                    ? `Contract sent to ${inProgressContract.contract_data?.clientEmail || "client"}`
+                    : "Contract sent to client@example.com"}
+                </div>
+                <div style={{ fontFamily:"'Manrope',sans-serif", fontSize:12, color:"var(--muted)", marginTop:2 }}>
+                  {inProgressContract ? `Awaiting review · status: ${inProgressContract.status}` : "Awaiting client review"}
+                </div>
               </div>
             </div>
           </div>
@@ -269,15 +407,15 @@ export default function HomePage() {
       {/* ── TESTIMONIALS ── */}
       <section id="reviews" className="testi-section">
         <div className="testi-head">
-          <div className="section-eyebrow">Testimonials</div>
-          <h2 className="section-title">Teams who <em>love</em> Contrakt</h2>
-          <p className="section-sub">Real stories from service businesses that transformed how they manage client contracts.</p>
+          <div className="section-eyebrow">Use Cases</div>
+          <h2 className="section-title">How teams use <em>Contrakt</em></h2>
+          <p className="section-sub">Illustrative examples of common contract workflows across different service businesses.</p>
         </div>
         <div className="testi-grid">
           {[
-            { q:"Before Contrakt, I was sending Word docs back and forth for weeks. Now we close projects in an afternoon. It completely changed how we run our studio.", name:"Sofia Martinez", handle:"Creative Studio Owner", bg:"#fde8e4", fg:"#a04030", i:"SM" },
-            { q:"Clients used to go silent after agreeing to terms. Now everything is signed before kickoff. The peace of mind alone is worth it.", name:"James Park", handle:"Growth Consultant", bg:"#e8eaf6", fg:"#3949ab", i:"JP" },
-            { q:"The templates are incredible. I used to pay $300 per contract. Now I handle everything in 5 minutes and it looks way more professional.", name:"Anika Osei", handle:"Agency Founder", bg:"#e8f5e9", fg:"#2e7d32", i:"AO" },
+            { q:"Creative studios can centralize approvals, revision requests, and final sign-off in one place.", name:"Creative Studio", handle:"Example workflow", bg:"#fde8e4", fg:"#a04030", i:"CS" },
+            { q:"Consultants can send clear scopes and collect acceptance before kickoff to reduce ambiguity.", name:"Independent Consultant", handle:"Example workflow", bg:"#e8eaf6", fg:"#3949ab", i:"IC" },
+            { q:"Agencies can keep templates consistent across clients while tracking every contract from sent to completed.", name:"Client Services Agency", handle:"Example workflow", bg:"#e8f5e9", fg:"#2e7d32", i:"CA" },
           ].map((t) => (
             <div key={t.name} className="testi-card">
               <div className="testi-stars">
@@ -322,7 +460,7 @@ export default function HomePage() {
               redirectPath="/dashboard"
             />
           </div>
-          <p className="cta-note">Free to start · No credit card required · Cancel anytime</p>
+          <p className="cta-note">Transparent monthly pricing · Choose the plan that fits your workflow</p>
         </div>
       </div>
 
@@ -338,11 +476,12 @@ export default function HomePage() {
             <span className="logo-text" style={{ fontSize:18 }}>Contrakt</span>
           </Link>
           <div className="footer-links">
-            {["Privacy","Terms","Support","Blog"].map((l) => (
-              <a key={l} href={`/${l.toLowerCase()}`} className="footer-link">{l}</a>
-            ))}
+            <a href="#features" className="footer-link">Features</a>
+            <a href="#how-it-works" className="footer-link">How it works</a>
+            <a href="#reviews" className="footer-link">Use cases</a>
+            <a href="#" className="footer-link">Top</a>
           </div>
-          <p className="footer-copy">© 2025 Contrakt. All rights reserved.</p>
+          <p className="footer-copy">© {currentYear} Contrakt. All rights reserved.</p>
         </div>
       </footer>
 

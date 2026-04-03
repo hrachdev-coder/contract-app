@@ -23,11 +23,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, employerName, contractData, publicToken } = body;
 
-    console.log("=== EMAIL SEND DEBUG ===");
-    console.log("To:", email);
-    console.log("From:", fromEmail);
-
-    // Վերահսկում պարտադիր դաշտերը
+    // Validate required fields
     if (!email || !employerName || !contractData || !publicToken) {
       return NextResponse.json(
         { success: false, message: "Missing required fields" },
@@ -43,8 +39,6 @@ export async function POST(req: Request) {
 
     const subject = `Service contract from ${employerName}`;
 
-    console.log("Sending email via Resend...");
-    
     const data = await resend.emails.send({
       from: fromEmail,
       to: email,
@@ -63,11 +57,8 @@ export async function POST(req: Request) {
       `,
     });
 
-    console.log("Email sent successfully:", data);
-
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error("EMAIL ERROR:", error instanceof Error ? error.message : error);
     return NextResponse.json(
       {
         success: false,

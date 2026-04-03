@@ -3,16 +3,14 @@ export const runtime = "nodejs";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-export async function GET(req: Request) {
-  const origin = new URL(req.url).origin;
-  const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL || null;
+export async function GET() {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ message: "Not found" }, { status: 404 });
+  }
 
   return NextResponse.json({
     success: true,
-    environment: process.env.VERCEL_ENV || process.env.NODE_ENV || "unknown",
-    origin,
-    configuredAppUrl,
-    appUrlMatchesOrigin: configuredAppUrl === origin,
+    environment: process.env.NODE_ENV || "unknown",
     env: {
       NEXT_PUBLIC_SUPABASE_URL: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
       NEXT_PUBLIC_SUPABASE_ANON_KEY: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
@@ -46,6 +44,10 @@ export async function POST(req: Request) {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json({ message: "Not found" }, { status: 404 });
+    }
+
     const data = await resend.emails.send({
       from: fromEmail,
       to: email,
@@ -58,20 +60,16 @@ export async function POST(req: Request) {
       `,
     });
 
-    console.log("Email sent successfully:", data);
-
     return NextResponse.json({ 
       success: true, 
       message: "Test email sent successfully",
       data 
     });
   } catch (error) {
-    console.error("TEST EMAIL ERROR:", error instanceof Error ? error.message : error);
     return NextResponse.json(
       {
         success: false,
         message: error instanceof Error ? error.message : "Test email failed",
-        error: error instanceof Error ? error.stack : "Unknown error",
       },
       { status: 500 }
     );

@@ -1,3 +1,4 @@
+import React from "react";
 import LemonSqueezyCheckoutButton from "./LemonSqueezyCheckoutButton";
 
 type BillingPlanId = "start" | "pro" | "business";
@@ -17,8 +18,8 @@ type BillingPlanGridProps = {
   name?: string | null;
   userId?: string | null;
   redirectPath?: string;
-  title?: string;
-  subtitle?: string;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
 };
 
 const BILLING_PLANS: BillingPlan[] = [

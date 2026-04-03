@@ -114,6 +114,9 @@ export default function NewContractPage() {
   const [billingError, setBillingError] = useState<string | null>(null);
   const [freePlanContractCount, setFreePlanContractCount] = useState<number | null>(null);
   const [planName, setPlanName] = useState<string | null>(null);
+  const isFreePlan =
+    (planName || "").toLowerCase() === "start" ||
+    (planName || "").toLowerCase() === "free";
   const isSocialTemplate = form.contractTemplate === "instagram";
   const rightsTermsContent = getRightsTermsContent(form.contractTemplate);
 
@@ -211,7 +214,6 @@ export default function NewContractPage() {
     // - Billing enabled
     // - No active access
     // - Not on free plan, or on free plan but already has a contract
-    const isFreePlan = (planName || "").toLowerCase() === "start" || (planName || "").toLowerCase() === "free";
     if (
       billingConfigured &&
       !hasActiveAccess &&
@@ -313,7 +315,7 @@ export default function NewContractPage() {
     );
   }
 
-  if (billingConfigured && !hasActiveAccess) {
+  if (billingConfigured && !hasActiveAccess && !isFreePlan) {
     return (
       <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
         <HomeHeader />
@@ -334,7 +336,7 @@ export default function NewContractPage() {
                 name={currentUser?.email?.split("@")[0] || null}
                 userId={currentUser?.id || null}
                 redirectPath="/dashboard/new"
-                title="Activate a plan before you <em>send contracts</em>"
+                title={<>Activate a plan before you <em>send contracts</em></>}
                 subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
               />
             </div>
@@ -351,7 +353,7 @@ export default function NewContractPage() {
   if (
     billingConfigured &&
     !hasActiveAccess &&
-    (planName?.toLowerCase() === "start" || planName?.toLowerCase() === "free") &&
+    isFreePlan &&
     freePlanContractCount !== null &&
     freePlanContractCount > 0
   ) {
@@ -373,7 +375,7 @@ export default function NewContractPage() {
                 name={currentUser?.email?.split("@")[0] || null}
                 userId={currentUser?.id || null}
                 redirectPath="/dashboard/new"
-                title="Upgrade to unlock unlimited contracts"
+                title={<>Upgrade to <em>unlock unlimited</em> contracts</>}
                 subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
               />
             </div>

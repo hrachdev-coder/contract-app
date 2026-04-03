@@ -7,8 +7,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { contractId } = body;
 
-    console.log("Delete API called with contractId:", contractId);
-
     if (!contractId) {
       return NextResponse.json(
         { success: false, message: "Contract ID is required" },
@@ -28,8 +26,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("User authenticated:", user.email);
-
     // First check if contract exists and belongs to user
     const { data: existingContract } = await supabase
       .from("contracts")
@@ -39,14 +35,11 @@ export async function POST(req: Request) {
       .single();
 
     if (!existingContract) {
-      console.log("Contract not found or doesn't belong to user");
       return NextResponse.json(
         { success: false, message: "Contract not found" },
         { status: 404 }
       );
     }
-
-    console.log("Contract found, deleting:", existingContract);
 
     // Delete the contract
     const { error } = await supabase
@@ -63,7 +56,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("Contract deleted successfully");
     return NextResponse.json({ success: true, message: "Contract deleted successfully" });
   } catch (error) {
     console.error("Delete contract error:", error);

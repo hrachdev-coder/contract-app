@@ -123,11 +123,21 @@ function readCustomUserId(payload: LemonSqueezyWebhookPayload, attributes: Recor
     return metaUserId;
   }
 
+  const metaUserIdCamel = payload.meta?.custom_data?.userId;
+  if (typeof metaUserIdCamel === "string" && metaUserIdCamel.length > 0) {
+    return metaUserIdCamel;
+  }
+
   const attributeCustomData = attributes.custom_data;
   if (attributeCustomData && typeof attributeCustomData === "object") {
     const nestedUserId = (attributeCustomData as Record<string, unknown>).user_id;
     if (typeof nestedUserId === "string" && nestedUserId.length > 0) {
       return nestedUserId;
+    }
+
+    const nestedUserIdCamel = (attributeCustomData as Record<string, unknown>).userId;
+    if (typeof nestedUserIdCamel === "string" && nestedUserIdCamel.length > 0) {
+      return nestedUserIdCamel;
     }
   }
 
@@ -224,7 +234,7 @@ export function extractSubscriptionRecord(payload: LemonSqueezyWebhookPayload): 
   const userId = readCustomUserId(payload, attributes);
   const subscriptionId = payload.data.id != null ? String(payload.data.id) : null;
 
-  if (!subscriptionId || !userId) {
+  if (!subscriptionId) {
     return null;
   }
 
@@ -239,7 +249,7 @@ export function extractSubscriptionRecord(payload: LemonSqueezyWebhookPayload): 
       : null;
 
   return {
-    userId,
+    userId: userId || "",
     subscriptionId,
     customerId: asString(attributes.customer_id),
     orderId: asString(attributes.order_id),
@@ -248,7 +258,10 @@ export function extractSubscriptionRecord(payload: LemonSqueezyWebhookPayload): 
     status: asStatus(attributes.status),
     statusFormatted: asString(attributes.status_formatted),
     planName: asString(attributes.variant_name) || asString(attributes.product_name),
-    customerEmail: asString(attributes.user_email),
+    customerEmail:
+      asString(attributes.user_email) ||
+      asString(attributes.customer_email) ||
+      asString(attributes.email),
     renewsAt: asString(attributes.renews_at),
     endsAt: asString(attributes.ends_at),
     trialEndsAt: asString(attributes.trial_ends_at),

@@ -2,15 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient, getUserOrNull } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import ResendContractButton from "../components/ResendContractButton";
 import FinalizeContractButton from "../components/FinalizeContractButton";
 import BillingPlanGrid from "../components/BillingPlanGrid";
 import DeleteContractButton from "../components/DeleteContractButton";
-import LemonSqueezyCheckoutButton from "../components/LemonSqueezyCheckoutButton";
-import LogoutButton from "../components/LogoutButton";
 import type { ContractData, ContractStatus } from "@/app/types/contracts";
 import { getContractTemplateById } from "@/lib/contract/templates";
 import "./dashboard.css";
@@ -60,11 +58,57 @@ function normalizeStatus(status: string): ContractStatus {
 
 export default function DashboardClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [billing, setBilling] = useState<BillingState | null>(null);
+  const [checkoutRecentlyCompleted, setCheckoutRecentlyCompleted] = useState(false);
+  const hasPurchasedPlan = Boolean(billing?.subscription);
+  const checkoutPending = searchParams.get("checkout") === "success";
+  const isPlanActivationPending = (checkoutPending || checkoutRecentlyCompleted) && !hasPurchasedPlan;
+  const shouldShowPricingPlans =
+    Boolean(billing?.configured) &&
+    !hasPurchasedPlan &&
+    !checkoutRecentlyCompleted &&
+    !checkoutPending;
+  const normalizedPlanName = (billing?.subscription?.plan_name || "").toLowerCase();
+  const isFreeWorkspacePlan =
+    normalizedPlanName === "start" || normalizedPlanName === "free";
+  const billingBadgeLabel = billing?.configured
+    ? isPlanActivationPending
+      ? "Plan activation pending"
+      : billing.hasActiveAccess
+      ? billing.subscription?.plan_name || billing.subscription?.status_formatted || "Active plan"
+      : hasPurchasedPlan
+        ? isFreeWorkspacePlan
+          ? "Free plan active"
+          : billing.subscription?.status_formatted || "Plan inactive"
+        : "No plan selected"
+    : "Billing disabled";
+  const billingBadgeBackground = billing?.configured
+    ? isPlanActivationPending
+      ? "#e0f2fe"
+      : billing.hasActiveAccess
+      ? "#dcfce7"
+      : hasPurchasedPlan
+        ? isFreeWorkspacePlan
+          ? "#e0e7ff"
+          : "#fef3c7"
+        : "#fee2e2"
+    : "#e2e8f0";
+  const billingBadgeColor = billing?.configured
+    ? isPlanActivationPending
+      ? "#0c4a6e"
+      : billing.hasActiveAccess
+      ? "#166534"
+      : hasPurchasedPlan
+        ? isFreeWorkspacePlan
+          ? "#3730a3"
+          : "#92400e"
+        : "#991b1b"
+    : "#334155";
 
   const statusMeta: Record<
     ContractStatus,
@@ -175,6 +219,83 @@ export default function DashboardClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const raw = window.localStorage.getItem("contrakt_checkout_completed_at");
+    if (!raw) {
+      return;
+    }
+
+    const completedAt = Number(raw);
+    if (!Number.isFinite(completedAt)) {
+      window.localStorage.removeItem("contrakt_checkout_completed_at");
+      return;
+    }
+
+    const ageMs = Date.now() - completedAt;
+    if (ageMs < 24 * 60 * 60 * 1000) {
+      setCheckoutRecentlyCompleted(true);
+      return;
+    }
+
+    window.localStorage.removeItem("contrakt_checkout_completed_at");
+  }, []);
+
+  useEffect(() => {
+    if (!billing?.configured || billing?.subscription || billing?.hasActiveAccess) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      void (async () => {
+        try {
+          const response = await fetch("/api/billing/subscription", {
+            method: "GET",
+            cache: "no-store",
+          });
+
+          if (!response.ok) {
+            return;
+          }
+
+          const payload = (await response.json()) as BillingState;
+          setBilling(payload);
+        } catch {
+          // Ignore transient polling errors; next poll will retry.
+        }
+      })();
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [billing?.configured, billing?.subscription, billing?.hasActiveAccess]);
+
+  useEffect(() => {
+    if (!checkoutPending) {
+      return;
+    }
+
+    window.localStorage.setItem("contrakt_checkout_completed_at", String(Date.now()));
+    setCheckoutRecentlyCompleted(true);
+
+    const timeoutId = window.setTimeout(() => {
+      router.replace("/dashboard");
+    }, 25000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [checkoutPending, router]);
+
+  useEffect(() => {
+    if (!hasPurchasedPlan) {
+      return;
+    }
+
+    window.localStorage.removeItem("contrakt_checkout_completed_at");
+    setCheckoutRecentlyCompleted(false);
+  }, [hasPurchasedPlan]);
+
   if (loading) {
     return (
       <div style={{ fontFamily: "sans-serif", background: "var(--background)", minHeight: "100vh" }}>
@@ -211,17 +332,15 @@ export default function DashboardClient() {
                 style={{
                   padding: "8px 14px",
                   borderRadius: "999px",
-                  background: billing.hasActiveAccess ? "#dcfce7" : "#fef3c7",
-                  color: billing.hasActiveAccess ? "#166534" : "#92400e",
+                  background: billingBadgeBackground,
+                  color: billingBadgeColor,
                   fontSize: "12px",
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
                 }}
               >
-                {billing.hasActiveAccess
-                  ? billing.subscription?.plan_name || billing.subscription?.status_formatted || "Active plan"
-                  : "Billing inactive"}
+                {billingBadgeLabel}
               </span>
               {billing.subscription?.renews_at ? (
                 <span style={{ color: "var(--text-secondary)", fontSize: "13px" }}>
@@ -240,30 +359,40 @@ export default function DashboardClient() {
               ) : null}
             </div>
           ) : null}
-          {billing?.configured ? (
+          {checkoutPending ? (
+            <p
+              style={{
+                marginTop: "16px",
+                textAlign: "center",
+                color: "var(--text-secondary)",
+                fontSize: "13px",
+              }}
+            >
+              Checkout completed. Finalizing your plan activation...
+            </p>
+          ) : null}
+          {shouldShowPricingPlans ? (
             <div style={{ marginTop: "28px" }}>
+              <p
+                style={{
+                  marginBottom: "12px",
+                  textAlign: "center",
+                  color: "var(--text-secondary)",
+                  fontSize: "13px",
+                }}
+              >
+                If you just completed checkout, plan confirmation may take a few seconds.
+              </p>
               <BillingPlanGrid
                 email={user?.email || null}
                 name={user?.email?.split("@")[0] || null}
                 userId={user?.id || null}
-                redirectPath="/dashboard"
-                title={billing?.hasActiveAccess ? "Change or upgrade your <em>workspace plan</em>" : "Choose a plan to <em>unlock your workspace</em>"}
-                subtitle={billing?.hasActiveAccess ? "Switch plans any time through a new hosted checkout. Your current subscription details stay visible below." : "Pick the plan that matches your current client volume and billing will unlock after the webhook confirms it."}
+                redirectPath="/dashboard?checkout=success"
+                title={<>Choose a plan to <em>unlock your workspace</em></>}
+                subtitle="Pick the plan that matches your current client volume and billing will unlock after the webhook confirms it."
               />
             </div>
-          ) : (
-            <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
-              <LemonSqueezyCheckoutButton
-                label="Upgrade Your Workspace"
-                className="btn-primary"
-                email={user?.email || null}
-                name={user?.email?.split("@")[0] || null}
-                userId={user?.id || null}
-                planId="pro"
-                redirectPath="/dashboard"
-              />
-            </div>
-          )}
+          ) : null}
           
           <div className="stats-grid">
             <div className="stat-card">
