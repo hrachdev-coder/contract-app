@@ -14,6 +14,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
 You can use `.env.local.example` as a reference for all supported variables.
 
+Optional Google Analytics setup:
+
+```bash
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-QQ3QZ7VG0K
+```
+
+When this variable is set, the app loads the Google Analytics tag globally from the root layout.
+
 Optional billing setup with LemonSqueezy:
 
 ```bash

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Client Contracts",
   description: "Create, send, and manage client contracts with ease",
 };
+
+const googleAnalyticsId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function RootLayout({
   children,
@@ -21,6 +24,7 @@ export default function RootLayout({
       <body className="antialiased bg-gray-50">
         {children}
       </body>
+      {googleAnalyticsId ? <GoogleAnalytics gaId={googleAnalyticsId} /> : null}
     </html>
   );
 }
