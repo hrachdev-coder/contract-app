@@ -8,6 +8,9 @@ type BillingPlan = {
   name: string;
   price: string;
   description: string;
+  bestFor: string;
+  contractVolume: string;
+  workflowFit: string;
   badge?: string;
   featured?: boolean;
   features: string[];
@@ -28,6 +31,9 @@ const BILLING_PLANS: BillingPlan[] = [
     name: "Start",
     price: "$9",
     description: "For solo operators sending a handful of polished contracts each month.",
+    bestFor: "Best for independent freelancers and solo consultants.",
+    contractVolume: "Light monthly contract volume",
+    workflowFit: "Core send-review-sign flow",
     features: [
       "Contract builder and templates",
       "Email sending and e-signature flow",
@@ -39,6 +45,9 @@ const BILLING_PLANS: BillingPlan[] = [
     name: "Pro",
     price: "$19",
     description: "For freelancers and lean agencies closing client work every week.",
+    bestFor: "Best for weekly deal flow and repeatable client onboarding.",
+    contractVolume: "Steady recurring contract volume",
+    workflowFit: "Recommended for growing client operations",
     badge: "Most Popular",
     featured: true,
     features: [
@@ -52,6 +61,9 @@ const BILLING_PLANS: BillingPlan[] = [
     name: "Business",
     price: "$49",
     description: "For teams managing larger client volume and higher-value engagements.",
+    bestFor: "Best for agencies or teams handling multiple accounts at once.",
+    contractVolume: "Higher contract volume across clients",
+    workflowFit: "Built for structured team-level operations",
     features: [
       "Everything in Pro",
       "Built for higher contract volume",
@@ -85,6 +97,21 @@ export default function BillingPlanGrid(props: BillingPlanGridProps) {
             <div className="pricing-price-row">
               <span className="pricing-price">{plan.price}</span>
               <span className="pricing-price-note">/ month</span>
+            </div>
+
+            <div className="pricing-meta-grid">
+              <div className="pricing-meta-card">
+                <span className="pricing-meta-label">Best fit</span>
+                <span className="pricing-meta-value">{plan.bestFor}</span>
+              </div>
+              <div className="pricing-meta-card">
+                <span className="pricing-meta-label">Volume</span>
+                <span className="pricing-meta-value">{plan.contractVolume}</span>
+              </div>
+              <div className="pricing-meta-card pricing-meta-card-wide">
+                <span className="pricing-meta-label">Workflow</span>
+                <span className="pricing-meta-value">{plan.workflowFit}</span>
+              </div>
             </div>
 
             <LemonSqueezyCheckoutButton

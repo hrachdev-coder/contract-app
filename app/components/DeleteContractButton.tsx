@@ -49,31 +49,12 @@ export default function DeleteContractButton({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="action-stack">
       <button
         type="button"
         onClick={handleDelete}
         disabled={loading}
         className="btn-delete"
-        style={{
-          fontFamily: "Manrope, sans-serif",
-          fontSize: "12px",
-          fontWeight: "500",
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-          color: "#dc2626",
-          background: "#fef2f2",
-          border: "1.5px solid #fecaca",
-          borderRadius: "100px",
-          padding: "8px 20px",
-          cursor: loading ? "not-allowed" : "pointer",
-          transition: "all 0.2s",
-          textDecoration: "none",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "8px",
-          opacity: loading ? 0.6 : 1
-        }}
       >
         {loading ? (
           "Deleting..."
@@ -97,11 +78,7 @@ export default function DeleteContractButton({
         )}
       </button>
       {error && (
-        <p
-          style={{ fontSize: "12px", color: "#dc2626", marginTop: "4px" }}
-        >
-          {error}
-        </p>
+        <p className="action-feedback action-feedback-error">{error}</p>
       )}
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./ContractReviewClient.module.css";
 
 import type { ContractData } from "@/app/types/contracts";
 import EnglishDatePicker from "@/app/components/EnglishDatePicker";
@@ -21,12 +22,14 @@ function deriveSignerName(email: string) {
 
 type ContractReviewClientProps = {
   publicToken: string;
+  contractId?: string | null;
   initialStatus: string;
   initialFeedback: string | null;
   clientEmail: string;
   senderEmail: string | null;
   createdAt: string;
   contractData: ContractData;
+  viewerRole?: "client" | "sender";
 };
 
 function labelForStatus(status: string) {
@@ -41,6 +44,38 @@ function labelForStatus(status: string) {
   return "Pending";
 }
 
+function reviewStatusSummary(status: string) {
+  if (status === "changes_requested") {
+    return "The sender can revise the agreement and send an updated version for review.";
+  }
+
+  if (status === "accepted" || status === "completed") {
+    return "This contract has already been approved and the acceptance trail is now part of the record.";
+  }
+
+  if (status === "viewed") {
+    return "The contract has been opened. Review the terms carefully before requesting edits or approving it.";
+  }
+
+  if (status === "updated") {
+    return "An updated version of the contract was sent. Review the revised terms before taking action.";
+  }
+
+  return "Review the contract, request changes if something is off, or approve it when the terms are correct.";
+}
+
+function senderStatusSummary(status: string) {
+  if (status === "changes_requested") {
+    return "The client asked for changes. Update the terms below and resend the contract from this screen.";
+  }
+
+  if (status === "accepted" || status === "completed") {
+    return "This contract has already been approved. Use this view to verify the final terms and the stored record.";
+  }
+
+  return "This dashboard screen is an internal preview of the client-facing agreement. Client approval actions stay on the public review link sent by email.";
+}
+
 export default function ContractReviewClient(props: ContractReviewClientProps) {
   const router = useRouter();
   const [form, setForm] = useState<ContractData>(props.contractData);
@@ -52,9 +87,12 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [signerName, setSignerName] = useState(() => deriveSignerName(props.clientEmail));
   const [signerTitle, setSignerTitle] = useState("");
+  const viewerRole = props.viewerRole || "client";
 
   const isFinalized = useMemo(() => status === "accepted" || status === "completed", [status]);
   const canSendUpdatedContract = useMemo(() => status === "changes_requested", [status]);
+  const isSenderView = viewerRole === "sender";
+  const fieldsDisabled = isSenderView ? !canSendUpdatedContract : isFinalized;
   const representativeName = useMemo(
     () => props.senderEmail || form.brandName || "Company Representative",
     [props.senderEmail, form.brandName]
@@ -69,6 +107,35 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
       }),
     [representativeName, props.clientEmail, props.createdAt, form]
   );
+  const contractValue = `${form.currency || "$"}${form.paymentAmount || "0"}`;
+  const headerKicker = isSenderView ? "Dashboard preview" : "Client review";
+  const heroBandTitle = isSenderView
+    ? "Inspect the exact agreement your client is reviewing."
+    : "Review the terms before you approve the work.";
+  const heroBandCopy = isSenderView
+    ? "This view exists so you can verify the client-facing agreement, revision notes, and stored record without using the public approval flow yourself."
+    : "This page keeps the contract text, requested edits, signer identity, and acceptance record in one place so the approval trail stays clean.";
+  const summaryCards = [
+    {
+      label: "Sender",
+      value: representativeName,
+      detail: isSenderView
+        ? "The account owner or representative who sent this agreement."
+        : "The representative who issued this agreement.",
+    },
+    {
+      label: "Client",
+      value: props.clientEmail,
+      detail: isSenderView
+        ? "The recipient who receives the public review link and approval request."
+        : "This link is intended for this reviewer and signer.",
+    },
+    {
+      label: "Created",
+      value: formatContractDate(props.createdAt),
+      detail: "Stored with the contract record and status history.",
+    },
+  ];
 
   const handleFormChange =
     (key: keyof ContractData) =>
@@ -108,7 +175,10 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
     setSuccess(null);
 
     try {
-      const res = await fetch(`/api/contract/${props.publicToken}/respond`, {
+      const basePath = isSenderView && props.contractId
+        ? `/api/contracts/${props.contractId}`
+        : `/api/contract/${props.publicToken}`;
+      const res = await fetch(`${basePath}/respond`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +220,10 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
     setSuccess(null);
 
     try {
-      const res = await fetch(`/api/contract/${props.publicToken}/resend`, {
+      const basePath = isSenderView && props.contractId
+        ? `/api/contracts/${props.contractId}`
+        : `/api/contract/${props.publicToken}`;
+      const res = await fetch(`${basePath}/resend`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -175,280 +248,248 @@ export default function ContractReviewClient(props: ContractReviewClientProps) {
   };
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-        fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
-        color: "#0f172a",
-        padding: "32px 16px",
-      }}
-    >
-      <section
-        style={{
-          maxWidth: "920px",
-          margin: "0 auto",
-          background: "#ffffff",
-          border: "1px solid #e2e8f0",
-          borderRadius: "16px",
-          padding: "24px",
-          boxShadow: "0 12px 30px rgba(2, 6, 23, 0.06)",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+    <main className={styles.shell}>
+      <section className={styles.panel}>
+        <div className={styles.headerRow}>
           <div>
-            <h1 style={{ margin: 0, fontSize: "30px", lineHeight: 1.1 }}>
-              {form.brandName || "Contract"}
-            </h1>
-            <p style={{ marginTop: "8px", color: "#475569" }}>
-              Review the contract terms, request edits, or approve the agreement.
-            </p>
+            <div className={styles.kicker}>{headerKicker}</div>
+            <h1 className={styles.title}>{form.brandName || "Contract"}</h1>
+            <p className={styles.subtitle}>{isSenderView ? senderStatusSummary(status) : reviewStatusSummary(status)}</p>
           </div>
-          <div
-            style={{
-              height: "fit-content",
-              padding: "8px 12px",
-              borderRadius: "999px",
-              border: "1px solid #bfdbfe",
-              background: "#eff6ff",
-              color: "#1e3a8a",
-              fontSize: "12px",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              fontWeight: 600,
-            }}
-          >
-            {labelForStatus(status)}
+          <div className={styles.statusBadge}>{labelForStatus(status)}</div>
+        </div>
+
+        <div className={styles.summaryGrid}>
+          {summaryCards.map((item) => (
+            <div key={item.label} className={styles.summaryCard}>
+              <span className={styles.summaryLabel}>{item.label}</span>
+              <div className={styles.summaryValue}>{item.value}</div>
+              <p className={styles.summaryDetail}>{item.detail}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.heroBand}>
+          <div>
+            <div className={styles.heroBandLabel}>Agreement snapshot</div>
+            <h2 className={styles.heroBandTitle}>{heroBandTitle}</h2>
+            <p className={styles.heroBandCopy}>{heroBandCopy}</p>
+          </div>
+          <div className={styles.heroBandMetrics}>
+            <div className={styles.heroMetricCard}>
+              <span className={styles.heroMetricLabel}>Contract value</span>
+              <strong className={styles.heroMetricValue}>{contractValue}</strong>
+            </div>
+            <div className={styles.heroMetricCard}>
+              <span className={styles.heroMetricLabel}>Review state</span>
+              <strong className={styles.heroMetricValue}>{labelForStatus(status)}</strong>
+            </div>
           </div>
         </div>
 
-        <div style={{ marginTop: "18px", display: "grid", gap: "10px" }}>
-          <div><strong>From sender:</strong> {representativeName}</div>
-          <div><strong>For client:</strong> {props.clientEmail}</div>
-          <div><strong>Created:</strong> {formatContractDate(props.createdAt)}</div>
-        </div>
+        <article className={styles.previewCard}>
+          <div className={styles.previewHead}>
+            <div>
+              <h2 className={styles.sectionTitle}>Client Service Agreement</h2>
+              <p className={styles.sectionCopy}>This draft is generated from the selected business terms. As fields change, the agreement updates so both parties are reviewing the same record.</p>
+            </div>
+          </div>
 
-        <article
-          style={{
-            marginTop: "24px",
-            border: "1px solid #e2e8f0",
-            borderRadius: "12px",
-            padding: "18px",
-            background: "#f8fafc",
-          }}
-        >
-          <h2 style={{ margin: 0, fontSize: "20px" }}>Client Service Agreement</h2>
-          <p style={{ marginTop: "8px", color: "#475569", lineHeight: 1.7 }}>
-            This contract draft is generated from your selected terms. You can edit the fields below and the agreement text updates automatically.
-          </p>
-
-          <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
+          <div className={styles.sectionStack}>
             {contractSections.map((section) => (
-              <section key={section.title}>
-                <h3 style={{ margin: 0, fontSize: "15px" }}>{section.title}</h3>
-                <p style={{ marginTop: "6px", marginBottom: 0, color: "#334155", lineHeight: 1.75 }}>
-                  {section.body}
-                </p>
+              <section key={section.title} className={styles.copySection}>
+                <h3 className={styles.copySectionTitle}>{section.title}</h3>
+                <p className={styles.copySectionBody}>{section.body}</p>
               </section>
             ))}
           </div>
 
-          <div
-            style={{
-              marginTop: "20px",
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "14px",
-            }}
-          >
-            <div style={{ borderTop: "1px dashed #94a3b8", paddingTop: "8px", color: "#475569" }}>
-              <div style={{ fontWeight: 600 }}>{representativeName}</div>
-              <div>Company Representative</div>
+          <div className={styles.signatureRow}>
+            <div className={styles.signatureCard}>
+              <div className={styles.signatureName}>{representativeName}</div>
+              <div className={styles.signatureRole}>Company representative</div>
             </div>
-            <div style={{ borderTop: "1px dashed #94a3b8", paddingTop: "8px", color: "#475569" }}>
-              <div style={{ fontWeight: 600 }}>{props.clientEmail}</div>
-              <div>Client</div>
+            <div className={styles.signatureCard}>
+              <div className={styles.signatureName}>{props.clientEmail}</div>
+              <div className={styles.signatureRole}>Client reviewer</div>
             </div>
           </div>
         </article>
 
-        <h2 style={{ marginTop: "24px", marginBottom: "8px", fontSize: "20px" }}>Edit Contract Terms</h2>
+        <section className={styles.editorCard}>
+          <div className={styles.editorHead}>
+            <div>
+              <h2 className={styles.sectionTitle}>Review and edit the contract terms</h2>
+              <p className={styles.sectionCopy}>{isSenderView ? "Use this section to inspect the exact client-facing agreement. Editing is only enabled when the client has asked for changes and you need to resend a revised version." : "Use this section to confirm the business details, request changes if something is wrong, or approve the contract with your legal name."}</p>
+            </div>
+          </div>
 
-        <div style={{ marginTop: "24px", display: "grid", gap: "14px" }}>
-          <label style={{ display: "grid", gap: "6px" }}>
-            Company name
-            <input value={form.brandName} onChange={handleFormChange("brandName")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
-          </label>
+          <div className={styles.formGrid}>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>Company name</span>
+              <input className={styles.input} value={form.brandName} onChange={handleFormChange("brandName")} disabled={fieldsDisabled} />
+            </label>
 
-          <label style={{ display: "grid", gap: "6px" }}>
-            Platform
-            <input value={form.platform} onChange={handleFormChange("platform")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
-          </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>Platform</span>
+              <input className={styles.input} value={form.platform} onChange={handleFormChange("platform")} disabled={fieldsDisabled} />
+            </label>
 
-          <label style={{ display: "grid", gap: "6px" }}>
-            Deliverables
-            <textarea value={form.deliverables} onChange={handleFormChange("deliverables")} disabled={isFinalized} style={{ minHeight: "90px", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
-          </label>
+            <label className={`${styles.field} ${styles.fieldWide}`}>
+              <span className={styles.fieldLabel}>Deliverables</span>
+              <textarea className={styles.textarea} value={form.deliverables} onChange={handleFormChange("deliverables")} disabled={fieldsDisabled} />
+            </label>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-            <label style={{ display: "grid", gap: "6px" }}>
-              Campaign start
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>Campaign start</span>
               <EnglishDatePicker
                 value={form.campaignStartDate}
                 onChange={handleDateChange("campaignStartDate")}
-                disabled={isFinalized}
+                disabled={fieldsDisabled}
                 placeholder="Select start date"
               />
             </label>
-            <label style={{ display: "grid", gap: "6px" }}>
-              Campaign end
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>Campaign end</span>
               <EnglishDatePicker
                 value={form.campaignEndDate}
                 onChange={handleDateChange("campaignEndDate")}
-                disabled={isFinalized}
+                disabled={fieldsDisabled}
                 placeholder="Select end date"
+              />
+            </label>
+
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>Payment amount</span>
+              <input className={styles.input} type="number" value={form.paymentAmount} onChange={handleFormChange("paymentAmount")} disabled={fieldsDisabled} />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>Currency</span>
+              <input className={styles.input} value={form.currency} onChange={handleFormChange("currency")} disabled={fieldsDisabled} />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.fieldLabel}>Payment deadline</span>
+              <input className={styles.input} type="number" value={form.paymentDeadlineDays} onChange={handleFormChange("paymentDeadlineDays")} disabled={fieldsDisabled} />
+            </label>
+
+            <label className={`${styles.field} ${styles.fieldWide}`}>
+              <span className={styles.fieldLabel}>Requested changes or notes</span>
+              <textarea
+                className={styles.textareaLarge}
+                value={feedback}
+                onChange={(event) => setFeedback(event.target.value)}
+                disabled={fieldsDisabled}
+                placeholder="Describe anything you want changed before approval"
               />
             </label>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-            <label style={{ display: "grid", gap: "6px" }}>
-              Payment amount
-              <input type="number" value={form.paymentAmount} onChange={handleFormChange("paymentAmount")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
-            </label>
-            <label style={{ display: "grid", gap: "6px" }}>
-              Currency
-              <input value={form.currency} onChange={handleFormChange("currency")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
-            </label>
-            <label style={{ display: "grid", gap: "6px" }}>
-              Payment deadline (days)
-              <input type="number" value={form.paymentDeadlineDays} onChange={handleFormChange("paymentDeadlineDays")} disabled={isFinalized} style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }} />
-            </label>
-          </div>
+          {error ? <p className={styles.messageError}>{error}</p> : null}
+          {success ? <p className={styles.messageSuccess}>{success}</p> : null}
 
-          <label style={{ display: "grid", gap: "6px" }}>
-            Notes / Requested changes
-            <textarea
-              value={feedback}
-              onChange={(event) => setFeedback(event.target.value)}
-              disabled={isFinalized}
-              style={{ minHeight: "110px", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }}
-              placeholder="Describe changes you want before approval"
-            />
-          </label>
-        </div>
+          {!isFinalized ? (
+            <div className={styles.actionPanel}>
+              {isSenderView ? (
+                canSendUpdatedContract ? (
+                  <>
+                    <div className={styles.noticeCard}>
+                      <span className={styles.noticeLabel}>Sender action</span>
+                      <p className={styles.noticeCopy}>The client asked for changes. Update the terms above, then resend the revised contract using the same client review link.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={sendUpdatedContract}
+                      disabled={Boolean(loadingAction)}
+                      className={styles.primaryAction}
+                    >
+                      {loadingAction === "send_updated" ? "Sending update..." : "Send updated contract"}
+                    </button>
+                  </>
+                ) : (
+                  <div className={styles.noticeCard}>
+                    <span className={styles.noticeLabel}>Internal preview</span>
+                    <p className={styles.noticeCopy}>This part solves one specific need: it lets you see the exact client-facing agreement from inside the dashboard. The legal name, consent, and approval actions are for the client link only, so they are hidden here.</p>
+                  </div>
+                )
+              ) : canSendUpdatedContract ? (
+                <>
+                  <div className={styles.noticeCard}>
+                    <span className={styles.noticeLabel}>Sender action</span>
+                    <p className={styles.noticeCopy}>The client asked for changes. Review the updated terms above, then send the revised contract back through the same workflow.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={sendUpdatedContract}
+                    disabled={Boolean(loadingAction)}
+                    className={styles.primaryAction}
+                  >
+                    {loadingAction === "send_updated" ? "Sending update..." : "Send updated contract"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className={styles.signerGrid}>
+                    <label className={styles.field}>
+                      <span className={styles.fieldLabel}>Full legal name</span>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        value={signerName}
+                        onChange={(event) => setSignerName(event.target.value)}
+                        placeholder="Jane Doe"
+                      />
+                    </label>
+                    <label className={styles.field}>
+                      <span className={styles.fieldLabel}>Title or role</span>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        value={signerTitle}
+                        onChange={(event) => setSignerTitle(event.target.value)}
+                        placeholder="Founder, Director, Consultant"
+                      />
+                    </label>
+                  </div>
 
-        {error && <p style={{ color: "#b91c1c", marginTop: "16px" }}>{error}</p>}
-        {success && <p style={{ color: "#166534", marginTop: "16px" }}>{success}</p>}
-
-        {!isFinalized && (
-          <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            {canSendUpdatedContract ? (
-              <button
-                type="button"
-                onClick={sendUpdatedContract}
-                disabled={Boolean(loadingAction)}
-                style={{
-                  border: "1px solid #2563eb",
-                  background: "#dbeafe",
-                  color: "#1d4ed8",
-                  borderRadius: "999px",
-                  padding: "10px 18px",
-                  fontWeight: 700,
-                }}
-              >
-                {loadingAction === "send_updated" ? "Sending update..." : "Send updated contract"}
-              </button>
-            ) : (
-              <>
-                <div
-                  style={{
-                    width: "100%",
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "12px",
-                  }}
-                >
-                  <label style={{ display: "grid", gap: "6px" }}>
-                    Full legal name
+                  <label className={styles.consentCard}>
                     <input
-                      type="text"
-                      value={signerName}
-                      onChange={(event) => setSignerName(event.target.value)}
-                      placeholder="Jane Doe"
-                      style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }}
+                      type="checkbox"
+                      checked={agreedToTerms}
+                      onChange={(event) => setAgreedToTerms(event.target.checked)}
+                      className={styles.checkbox}
                     />
+                    <span>{ACCEPTANCE_CONSENT_TEXT}</span>
                   </label>
-                  <label style={{ display: "grid", gap: "6px" }}>
-                    Title / role (optional)
-                    <input
-                      type="text"
-                      value={signerTitle}
-                      onChange={(event) => setSignerTitle(event.target.value)}
-                      placeholder="Founder, Director, Consultant"
-                      style={{ padding: "10px", border: "1px solid #cbd5e1", borderRadius: "8px" }}
-                    />
-                  </label>
-                </div>
 
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "10px",
-                    width: "100%",
-                    background: "#f8fafc",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "10px",
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    color: "#334155",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={agreedToTerms}
-                    onChange={(event) => setAgreedToTerms(event.target.checked)}
-                    style={{ marginTop: "2px" }}
-                  />
-                  <span>{ACCEPTANCE_CONSENT_TEXT}</span>
-                </label>
+                  <div className={styles.actionRow}>
+                    <button
+                      type="button"
+                      onClick={() => submitAction("request_changes")}
+                      disabled={Boolean(loadingAction)}
+                      className={styles.secondaryAction}
+                    >
+                      {loadingAction === "request_changes" ? "Submitting..." : "Request edits"}
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() => submitAction("request_changes")}
-                  disabled={Boolean(loadingAction)}
-                  style={{
-                    border: "1px solid #f59e0b",
-                    background: "#fffbeb",
-                    color: "#92400e",
-                    borderRadius: "999px",
-                    padding: "10px 18px",
-                    fontWeight: 600,
-                  }}
-                >
-                  {loadingAction === "request_changes" ? "Submitting..." : "Request edits"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => submitAction("accept")}
-                  disabled={Boolean(loadingAction)}
-                  style={{
-                    border: "1px solid #16a34a",
-                    background: "#dcfce7",
-                    color: "#166534",
-                    borderRadius: "999px",
-                    padding: "10px 18px",
-                    fontWeight: 700,
-                  }}
-                >
-                  {loadingAction === "accept" ? "Finalizing..." : "Accept contract"}
-                </button>
-              </>
-            )}
-          </div>
-        )}
+                    <button
+                      type="button"
+                      onClick={() => submitAction("accept")}
+                      disabled={Boolean(loadingAction)}
+                      className={styles.primaryAction}
+                    >
+                      {loadingAction === "accept" ? "Finalizing..." : "Accept contract"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className={styles.noticeCard}>
+              <span className={styles.noticeLabel}>Approval record</span>
+              <p className={styles.noticeCopy}>This agreement has already been finalized. The status, consent text, and signer details are preserved as part of the contract trail.</p>
+            </div>
+          )}
+        </section>
       </section>
     </main>
   );

@@ -2,6 +2,10 @@ function trimTrailingSlash(value: string) {
   return value.endsWith("/") ? value.slice(0, -1) : value;
 }
 
+function isLocalHost(host: string) {
+  return /^(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?$/i.test(host);
+}
+
 export function getConfiguredAppUrl() {
   const configuredUrl =
     (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL
@@ -25,7 +29,8 @@ export function getRequestBaseUrl(request: Request) {
   const host = forwardedHost || request.headers.get("host");
 
   if (host) {
-    return trimTrailingSlash(`${forwardedProto || "https"}://${host}`);
+    const protocol = forwardedProto || (isLocalHost(host) ? "http" : "https");
+    return trimTrailingSlash(`${protocol}://${host}`);
   }
 
   try {

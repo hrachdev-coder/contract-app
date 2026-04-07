@@ -38,16 +38,16 @@ export default function FinalizeContractButton({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="action-stack">
       <button
         type="button"
         onClick={handleFinalize}
         disabled={loading}
-        className="btn-secondary disabled:opacity-50"
+        className="btn-secondary"
       >
         {loading ? "Sending PDF..." : "Send Final PDF"}
       </button>
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {error ? <p className="action-feedback action-feedback-error">{error}</p> : null}
     </div>
   );
 }

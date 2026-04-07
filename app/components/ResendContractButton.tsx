@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ResendContractButton({
+  contractId,
   publicToken,
 }: {
-  publicToken: string;
+  contractId?: string;
+  publicToken?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -14,11 +16,22 @@ export default function ResendContractButton({
   const [sent, setSent] = useState(false);
 
   const handleResend = async () => {
+    const endpoint = contractId
+      ? `/api/contracts/${contractId}/resend`
+      : publicToken
+        ? `/api/contract/${publicToken}/resend`
+        : null;
+
+    if (!endpoint) {
+      setError("Review link is unavailable for this contract.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSent(false);
     try {
-      const res = await fetch(`/api/contract/${publicToken}/resend`, {
+      const res = await fetch(endpoint, {
         method: "POST",
       });
 
@@ -36,17 +49,17 @@ export default function ResendContractButton({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="action-stack">
       <button
         type="button"
         onClick={handleResend}
         disabled={loading || sent}
-        className="btn-resend disabled:opacity-50"
+        className="btn-resend"
       >
         {loading ? "Sending..." : sent ? "Sent ✓" : "Resend to client"}
       </button>
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
-      {sent ? <p className="text-xs text-green-600">Client notified by email.</p> : null}
+      {error ? <p className="action-feedback action-feedback-error">{error}</p> : null}
+      {sent ? <p className="action-feedback action-feedback-success">Client notified by email.</p> : null}
     </div>
   );
 }

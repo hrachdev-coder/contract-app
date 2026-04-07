@@ -1,0 +1,414 @@
+.shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 28%),
+    linear-gradient(180deg, #eef4ff 0%, #f8fafc 34%, #ffffff 100%);
+  color: #0f172a;
+  padding: 32px 16px 64px;
+  font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.panel {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  gap: 22px;
+}
+
+.headerRow,
+.heroBand,
+.previewCard,
+.editorCard,
+.summaryCard,
+.noticeCard {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(226, 232, 240, 0.96);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.07);
+}
+
+.headerRow {
+  border-radius: 30px;
+  padding: 30px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2563eb;
+}
+
+.title {
+  margin: 16px 0 10px;
+  font-family: "Sora", serif;
+  font-size: clamp(34px, 5vw, 48px);
+  font-weight: 500;
+  line-height: 1.08;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 680px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #475569;
+}
+
+.statusBadge {
+  flex-shrink: 0;
+  height: fit-content;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.summaryCard {
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.summaryLabel,
+.heroBandLabel,
+.fieldLabel,
+.noticeLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.summaryValue {
+  margin-top: 12px;
+  font-family: "Sora", serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.summaryDetail,
+.heroBandCopy,
+.sectionCopy,
+.noticeCopy {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #475569;
+}
+
+.heroBand {
+  border-radius: 28px;
+  padding: 26px;
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.heroBandTitle,
+.sectionTitle {
+  margin: 10px 0 0;
+  font-family: "Sora", serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.heroBandMetrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 300px;
+}
+
+.heroMetricCard {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.heroMetricLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.heroMetricValue {
+  display: block;
+  margin-top: 10px;
+  font-family: "Sora", serif;
+  font-size: 21px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.previewCard,
+.editorCard {
+  border-radius: 30px;
+  padding: 30px;
+}
+
+.previewHead,
+.editorHead {
+  margin-bottom: 22px;
+}
+
+.sectionStack {
+  display: grid;
+  gap: 18px;
+}
+
+.copySection {
+  padding: 18px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #f8fafc;
+}
+
+.copySectionTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.copySectionBody {
+  margin: 10px 0 0;
+  color: #334155;
+  line-height: 1.8;
+}
+
+.signatureRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.signatureCard {
+  border-top: 1px dashed #94a3b8;
+  padding-top: 10px;
+  color: #475569;
+}
+
+.signatureName {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.signatureRole {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+}
+
+.input,
+.textarea,
+.textareaLarge {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  font: inherit;
+  color: #0f172a;
+}
+
+.textarea,
+.textareaLarge {
+  resize: vertical;
+}
+
+.textarea {
+  min-height: 96px;
+}
+
+.textareaLarge {
+  min-height: 120px;
+}
+
+.actionPanel {
+  margin-top: 22px;
+  display: grid;
+  gap: 16px;
+}
+
+.signerGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.consentCard,
+.noticeCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #334155;
+}
+
+.consentCard {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+}
+
+.checkbox {
+  margin-top: 3px;
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primaryAction,
+.secondaryAction {
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.primaryAction {
+  border: 1px solid #16a34a;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.secondaryAction {
+  border: 1px solid #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.primaryAction:hover,
+.secondaryAction:hover {
+  transform: translateY(-1px);
+}
+
+.primaryAction:disabled,
+.secondaryAction:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.messageError,
+.messageSuccess {
+  margin: 16px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.messageError {
+  color: #b91c1c;
+}
+
+.messageSuccess {
+  color: #166534;
+}
+
+@media (max-width: 900px) {
+  .headerRow,
+  .heroBand {
+    flex-direction: column;
+  }
+
+  .summaryGrid,
+  .signatureRow,
+  .signerGrid,
+  .formGrid,
+  .heroBandMetrics {
+    grid-template-columns: 1fr;
+  }
+
+  .heroBandMetrics {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .shell {
+    padding: 18px 12px 44px;
+  }
+
+  .headerRow,
+  .previewCard,
+  .editorCard,
+  .heroBand,
+  .summaryCard {
+    border-radius: 24px;
+    padding: 22px 18px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .heroBandTitle,
+  .sectionTitle {
+    font-size: 24px;
+  }
+
+  .actionRow {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .primaryAction,
+  .secondaryAction {
+    width: 100%;
+  }
+}

@@ -1,9 +1,32 @@
 /* Dashboard Styles - Matching Home Page Design */
 
+.dashboard-shell {
+  background:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 30%),
+    linear-gradient(180deg, #eef4ff 0%, #f8fafc 34%, #ffffff 100%);
+}
+
 .dashboard-container {
   min-height: 100vh;
   background: var(--background);
   font-family: 'Manrope', sans-serif;
+}
+
+.dashboard-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(226,232,240,0.92);
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 18px;
 }
 
 .dashboard-header {
@@ -27,6 +50,184 @@
   font-weight: 300;
   color: var(--text-secondary);
   margin-bottom: 40px;
+  max-width: 760px;
+}
+
+.billing-inline-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.billing-inline-badge {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.billing-inline-copy,
+.dashboard-helper-note {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.dashboard-helper-note {
+  margin-top: 16px;
+}
+
+.dashboard-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
+  gap: 22px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.dashboard-overview-card,
+.dashboard-side-panel {
+  background: rgba(255,255,255,0.94);
+  border: 1px solid rgba(226,232,240,0.96);
+  border-radius: 28px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.07);
+}
+
+.dashboard-overview-card {
+  padding: 28px;
+}
+
+.dashboard-overview-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.dashboard-panel-label {
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.dashboard-panel-title {
+  margin: 10px 0 0;
+  font-family: 'Sora', serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.dashboard-panel-cta {
+  flex-shrink: 0;
+}
+
+.dashboard-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.dashboard-signal-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 18px;
+}
+
+.dashboard-signal-label {
+  font-family: 'Manrope', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.dashboard-signal-value {
+  margin-top: 12px;
+  font-family: 'Sora', serif;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.dashboard-signal-copy {
+  margin: 10px 0 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.dashboard-side-panel {
+  padding: 24px;
+}
+
+.dashboard-side-title {
+  margin: 10px 0 6px;
+  font-family: 'Sora', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dashboard-side-meta {
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.dashboard-side-copy {
+  margin: 14px 0 18px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.dashboard-side-stack {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.dashboard-side-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.dashboard-side-row strong {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.dashboard-side-link {
+  width: 100%;
+  justify-content: center;
+}
+
+.dashboard-pricing-shell {
+  margin-top: 28px;
 }
 
 .dashboard-actions {
@@ -109,6 +310,14 @@
   text-transform: uppercase;
 }
 
+.stat-detail {
+  margin: 10px 0 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
 .contracts-section {
   max-width: 1180px;
   margin: 0 auto;
@@ -146,6 +355,14 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
+}
+
+.section-caption {
+  margin: 8px 0 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
 }
 
 .section-title {
@@ -285,10 +502,87 @@
   color: var(--text-muted);
 }
 
+.contract-date-spaced {
+  margin-top: 6px;
+}
+
 .contract-status {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.contract-guidance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+}
+
+.contract-guidance-copy {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.contract-guidance-link,
+.contract-guidance-muted {
+  flex-shrink: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.contract-guidance-link {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.contract-guidance-muted {
+  color: var(--text-muted);
+}
+
+.contract-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.contract-meta-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.contract-meta-card-wide {
+  grid-column: 1 / -1;
+}
+
+.contract-meta-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.contract-meta-value {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.6;
 }
 
 .status-badge {
@@ -334,10 +628,32 @@
 .contract-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid var(--border);
+}
+
+.action-stack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-feedback {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.action-feedback-error {
+  color: #dc2626;
+}
+
+.action-feedback-success {
+  color: #166534;
 }
 
 .btn-secondary {
@@ -361,6 +677,14 @@
 .btn-secondary:hover {
   background: var(--border-light);
   border-color: var(--primary);
+}
+
+.btn-secondary:disabled,
+.btn-resend:disabled,
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-resend {
@@ -422,54 +746,189 @@
   height: 14px;
 }
 
+.dashboard-mobile-fab {
+  display: none;
+}
+
 /* Responsive Design */
 @media (max-width: 900px) {
   .dashboard-header {
-    padding: 80px 24px 32px;
+    padding: 94px 20px 28px;
+  }
+
+  .dashboard-overview-grid,
+  .dashboard-signal-grid,
+  .contract-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-overview-head,
+  .contract-guidance {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
   .contracts-section {
-    padding: 0 24px 80px;
+    padding: 0 20px 100px;
   }
   
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card,
+  .contract-card,
+  .empty-state {
+    border-radius: 28px;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  }
+
+  .dashboard-title {
+    font-size: clamp(34px, 8vw, 48px);
+    line-height: 1.02;
+  }
+
+  .dashboard-subtitle {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 24px;
   }
   
   .section-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
   }
   
   .contract-header {
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
   }
   
   .contract-status {
     align-self: flex-start;
   }
+
+  .contracts-grid {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+    gap: 16px;
+  }
+
+  .billing-inline-row {
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 600px) {
+  .dashboard-container {
+    background: transparent;
+  }
+
   .dashboard-title {
     font-size: 32px;
   }
+
+  .dashboard-header {
+    padding: calc(88px + env(safe-area-inset-top)) 16px 24px;
+  }
+
+  .dashboard-overview-card,
+  .dashboard-side-panel {
+    padding: 20px 18px;
+    border-radius: 24px;
+  }
+
+  .dashboard-panel-title {
+    font-size: 22px;
+  }
+
+  .contracts-section {
+    padding: 0 16px 110px;
+  }
+
+  .stat-card {
+    padding: 24px 22px;
+  }
+
+  .stat-value {
+    font-size: 40px;
+  }
   
   .empty-state {
-    padding: 60px 24px;
+    padding: 52px 22px;
   }
   
   .contract-card {
-    padding: 24px;
+    padding: 22px 18px;
   }
   
   .contract-brand {
     font-size: 20px;
   }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+
+  .btn-secondary,
+  .btn-resend,
+  .btn-delete {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
   
   .contract-actions {
     flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .contract-guidance-link,
+  .contract-guidance-muted {
+    width: 100%;
+  }
+
+  .dashboard-mobile-fab {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    z-index: 320;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 56px;
+    border-radius: 20px;
+    background: var(--gradient);
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 20px 46px rgba(59, 130, 246, 0.36);
+  }
+
+  .dashboard-mobile-fab-plus {
+    font-size: 22px;
+    line-height: 1;
   }
 }

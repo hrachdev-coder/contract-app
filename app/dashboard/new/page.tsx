@@ -114,9 +114,7 @@ export default function NewContractPage() {
   const [billingError, setBillingError] = useState<string | null>(null);
   const [freePlanContractCount, setFreePlanContractCount] = useState<number | null>(null);
   const [planName, setPlanName] = useState<string | null>(null);
-  const isFreePlan =
-    (planName || "").toLowerCase() === "start" ||
-    (planName || "").toLowerCase() === "free";
+  const isFreePlan = (planName || "").toLowerCase() === "free";
   const isSocialTemplate = form.contractTemplate === "instagram";
   const rightsTermsContent = getRightsTermsContent(form.contractTemplate);
 
@@ -153,7 +151,7 @@ export default function NewContractPage() {
         setPlanName(payload.subscription?.plan_name || (payload.subscription === null ? "free" : null));
 
         // If on free plan, count contracts
-        if ((payload.subscription?.plan_name || "").toLowerCase() === "start" || (payload.subscription?.plan_name || "").toLowerCase() === "free") {
+        if ((payload.subscription?.plan_name || "").toLowerCase() === "free") {
           const { count, error } = await supabase
             .from("contracts")
             .select("id", { count: "exact", head: true })
@@ -337,7 +335,7 @@ export default function NewContractPage() {
                 userId={currentUser?.id || null}
                 redirectPath="/dashboard/new"
                 title={<>Activate a plan before you <em>send contracts</em></>}
-                subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
+                subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as your subscription is confirmed."
               />
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
@@ -376,7 +374,7 @@ export default function NewContractPage() {
                 userId={currentUser?.id || null}
                 redirectPath="/dashboard/new"
                 title={<>Upgrade to <em>unlock unlimited</em> contracts</>}
-                subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as LemonSqueezy confirms the subscription."
+                subtitle="Pick the tier that matches your current workload. Your access unlocks as soon as your subscription is confirmed."
               />
             </div>
             <div style={{ display: "flex", justifyContent: "center" }}>
